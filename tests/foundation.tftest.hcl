@@ -12,6 +12,10 @@ run "network_contract" {
     error_message = "The foundation must preserve accountable ownership metadata."
   }
   assert {
+    condition     = module.spoke.name == "vnet-portfolio-spoke" && output.network_configuration.spoke.tags.owner == "platform-engineering" && output.network_configuration.spoke.nsg_tags.owner == "platform-engineering"
+    error_message = "Default inputs must preserve Team A's existing Azure name and owner tags."
+  }
+  assert {
     condition     = !azurerm_virtual_network_peering.hub_to_spoke.allow_forwarded_traffic && !azurerm_virtual_network_peering.spoke_to_hub.allow_forwarded_traffic
     error_message = "The lab must not enable forwarded traffic."
   }

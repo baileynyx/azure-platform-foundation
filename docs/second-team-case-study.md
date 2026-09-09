@@ -7,9 +7,9 @@
 
 Keep shared connectivity under platform ownership. Give each application team a defined network allocation and its own change boundary. Approve connectivity from an explicit traffic requirement, and validate both permitted and denied paths before handing over the environment.
 
-This is a design exercise grounded in the working [Azure platform foundation](../README.md). Team A and Team B are fictional. The repository implements one hub and one spoke; the second spoke, separate state, deployment identities and operating model below are **proposed extensions**, not completed customer work.
+This is a design exercise grounded in the working [Azure platform foundation](../README.md). Team A and Team B are fictional. The repository now implements one hub, Team A and an optional Team B spoke with separate owner tags. Separate state, deployment identities and the operating model below remain **proposed extensions**, not completed customer work.
 
-**Evidence:** the existing baseline passed provider validation and [five Terraform mock tests](https://github.com/baileynyx/azure-platform-foundation/actions/runs/34357895861). No Azure deployment or packet-flow verification has been performed.
+**Evidence:** the original baseline passed provider validation and [five Terraform mock tests](https://github.com/baileynyx/azure-platform-foundation/actions/runs/34357895861). The second-team increment adds regression and invalid-input tests; see the [current validation record](../VALIDATION.md) for its execution status. No Azure deployment or packet-flow verification has been performed.
 
 ## The scenario and requirements
 
@@ -28,18 +28,18 @@ No measured onboarding time or production reliability outcome is claimed.
 
 ## What the repository proves today
 
-The [root configuration](../main.tf) derives a hub and spoke from one IPv4 /16. Each uses the same [network module](../modules/network/main.tf): VNet, workload subnet, NSG, inbound deny rule and subnet-to-NSG association. Two peering resources connect the VNets without forwarded traffic or gateway transit.
+The [root configuration](../main.tf) derives a hub and Team A spoke from one IPv4 /16, with Team B enabled by an optional input object. All use the same [network module](../modules/network/main.tf): VNet, workload subnet, NSG, inbound deny rule and subnet-to-NSG association. Each enabled spoke has both peering directions to the hub, without forwarded traffic or gateway transit.
 
-| Capability | Implemented baseline | Second-team proposal |
+| Capability | Current implementation | Remaining operational work |
 | --- | --- | --- |
-| Address allocation | Hub `10.42.0.0/20`; spoke `10.42.16.0/20` | Reserve `10.42.32.0/20` for Team B after inventory review |
-| Workload subnet | One /24 per VNet | Team B subnet `10.42.32.0/24` |
-| Ownership | One owner value on taggable resources | Separate platform and team ownership metadata |
-| State | One root using local state by default | Independently controlled remote states |
-| Connectivity | Bidirectional peering and explicit inbound deny | Platform-approved peerings and narrow allow rules |
+| Address allocation | Hub slot 0; Team A slot 1; optional Team B slot 2 by default (`10.42.32.0/20`) | Check and reserve the allocation in the real network inventory |
+| Workload subnet | One /24 per VNet, including Team B when enabled | Deploy workloads and verify connectivity |
+| Ownership | Platform owner on hub/resource group; optional Team A owner; required enabled Team B owner | Enforce authority with identity scopes, not tags |
+| State | One root and one resource group using local state by default | Independently controlled remote states and resource scopes |
+| Connectivity | Both peering directions per spoke and explicit inbound deny | Approval process and narrow application allow rules |
 | Delivery | Credential-free validation workflow | Separate protected deployment workflow with OIDC |
 
-The proposed allocation follows the existing arithmetic; it is not a reservation in a real IP address management system. The current code prevents overlap between its two derived VNets, but does not inspect networks elsewhere in Azure or on premises.
+The Team B allocation follows the existing arithmetic; it is not a reservation in a real IP address management system. Its index must be an integer from 2 to 15, preventing reuse of the hub and Team A slots. The code does not inspect networks elsewhere in Azure or on premises.
 
 ## Decision 1: separate state by ownership and lifecycle
 
@@ -63,7 +63,7 @@ For an already deployed environment, splitting state would need an explicit reso
 
 Team B can reuse the network module, but copying the root would create another hub-and-spoke foundation rather than extend the shared one.
 
-The extension should introduce explicit spoke inputs and stable resource addresses, preserve the existing spoke, and assign owners per boundary. Validate every proposed allocation against the authoritative network inventory. The current root's single `owner` variable is not sufficient for multiple independently owned teams.
+The implemented increment adds `team_b` and `team_a_owner` inputs while retaining `module.spoke` and both original peering addresses. Team B uses the stable key `team_b` in its own module and peerings. Platform metadata still uses `owner`; Team A inherits that value unless overridden, and enabled Team B requires an owner. These tags identify responsibility but do not grant or restrict access. Validate every requested allocation against the authoritative network inventory.
 
 The tradeoff is additional configuration and orchestration. It is justified when owners and release schedules differ; it would be unnecessary complexity for a disposable single-operator lab.
 
@@ -100,7 +100,7 @@ These are proposed operating procedures. No incident, outage or recovery timing 
 
 ## Evidence and remaining acceptance gates
 
-The [recorded validation](../VALIDATION.md) covers source commit [20eb4cf](https://github.com/baileynyx/azure-platform-foundation/commit/20eb4cf1372a8f27eafb9ebf69f1a1d30e96718e):
+The original five-test baseline in the [recorded validation](../VALIDATION.md) covers source commit [20eb4cf](https://github.com/baileynyx/azure-platform-foundation/commit/20eb4cf1372a8f27eafb9ebf69f1a1d30e96718e):
 
 | Passing mock run | What it checks |
 | --- | --- |
@@ -112,9 +112,11 @@ The [recorded validation](../VALIDATION.md) covers source commit [20eb4cf](https
 
 These assertions do not establish Azure authorization, deployed NSG association, packet flow, DNS behavior or recovery. A green mock suite is evidence about the specified configuration, not an operational acceptance test.
 
-Before claiming Team B is onboarded, the extension would need:
+The new [two-team test suite](../tests/two_teams.tftest.hcl) compares Team A and hub configuration before and after Team B is enabled, verifies owner tags and peerings, exercises custom allocation and disabling, and rejects invalid owners and reserved or invalid allocation slots. This is configuration regression evidence, not a live state transition or network isolation test.
 
-1. A reviewed second-spoke implementation and tests proving Team A's allocation stays unchanged.
+Before claiming Team B is operationally onboarded, the extension would need:
+
+1. Successful review and execution of the second-spoke implementation and regression tests; current status is linked in `VALIDATION.md`.
 2. Remote state and identity checks showing that team deployments cannot modify platform-owned resources.
 3. A disposable Azure rehearsal verifying NSG associations, both peerings and required DNS behavior.
 4. Positive tests for approved connections and negative tests for prohibited inter-team traffic.
@@ -125,6 +127,6 @@ Before claiming Team B is onboarded, the extension would need:
 
 Adding a second spoke is a small configuration change. Giving a second team reliable ownership requires explicit decisions about state, authority, dependencies and recovery.
 
-The next implementation increment should add the second spoke and configuration tests first. Remote state and protected deployment can follow as separately reviewable changes. Each stage should publish the evidence it actually produces.
+The first implementation increment now supplies the optional second spoke, per-team owner tags, a runnable variable example and configuration tests. Remote state and protected deployment remain separately reviewable future changes. Each stage should publish the evidence it actually produces.
 
 [Back to the project](../README.md) · [Bailey's profile](https://github.com/baileynyx)

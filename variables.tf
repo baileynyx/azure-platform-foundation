@@ -43,3 +43,34 @@ variable "base_cidr" {
     error_message = "Supply a valid IPv4 /16 CIDR."
   }
 }
+
+variable "team_a_owner" {
+  description = "Optional Team A owner tag. Null preserves the existing platform owner tag."
+  type        = string
+  default     = null
+  validation {
+    condition     = var.team_a_owner == null ? true : length(trimspace(var.team_a_owner)) > 0
+    error_message = "team_a_owner must be null or a nonblank accountable team."
+  }
+}
+
+variable "team_b" {
+  description = "Optional second spoke. Null disables it. Index 0 is the hub and 1 is Team A; use an unused integer slot from 2 to 15."
+  type = object({
+    owner            = string
+    allocation_index = optional(number, 2)
+  })
+  default = null
+  validation {
+    condition     = var.team_b == null ? true : try(length(trimspace(var.team_b.owner)) > 0, false)
+    error_message = "An enabled Team B spoke requires a nonblank owner."
+  }
+  validation {
+    condition = var.team_b == null ? true : (
+      var.team_b.allocation_index >= 2 &&
+      var.team_b.allocation_index <= 15 &&
+      floor(var.team_b.allocation_index) == var.team_b.allocation_index
+    )
+    error_message = "Team B allocation_index must be an integer from 2 to 15; 0 and 1 are reserved."
+  }
+}
