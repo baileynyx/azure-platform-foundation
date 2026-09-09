@@ -4,6 +4,10 @@ A small subscription-level Terraform networking foundation: one resource group, 
 
 **This is an independent networking lab, not a complete enterprise landing zone.** It contains no compute, managed firewall, gateway, public IP, or Azure deployment automation. CI validates without cloud credentials.
 
+## Start here: five-minute interview demo
+
+[Follow the demo walkthrough](DEMO.md) for the architecture, copyable validation commands, expected results, regression assertions and engineering tradeoffs. No Azure credentials are needed; the walkthrough links the merged implementation and its 17 passing mock tests.
+
 ## Featured engineering case study
 
 [Onboarding a second application team](docs/second-team-case-study.md): the implemented second-spoke increment, its regression evidence, and the state ownership, connectivity approval and recovery work still required for a team-operated platform.
