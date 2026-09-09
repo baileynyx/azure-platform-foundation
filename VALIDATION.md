@@ -1,10 +1,14 @@
 # Validation
 
-September 9, 2026:
+September 9, 2026: the [first hosted Terraform validation run](https://github.com/baileynyx/azure-platform-foundation/actions/runs/34357895861) passed for source commit `20eb4cf1372a8f27eafb9ebf69f1a1d30e96718e`.
 
-- Terraform 1.9.8 formatting check passed for all configuration and test files.
-- `terraform init -backend=false -input=false` installed AzureRM 4.81.0 and generated the committed dependency lock file. Terraform reported the provider signed by HashiCorp.
-- `terraform validate` could not load the provider schema because this runtime denied the provider's local Unix socket creation. This is an environment limitation, not a successful validation result.
-- Five mock test runs are supplied: network/ownership/peering contract, invalid environment, invalid owner, invalid CIDR allocation and child-module inbound security contract. They have **not been executed** because the provider cannot start in this runtime.
+- Terraform 1.9.8 formatting check: passed.
+- Initialization with the committed AzureRM 4.81.0 lock file: passed.
+- Provider-backed `terraform validate`: passed.
+- `terraform test`: **5 passed, 0 failed**.
 
-The workflow is configured to initialize, validate and run the tests in GitHub Actions. Its first successful hosted run is still required. No Azure subscription was accessed, and no live plan, apply, network test or teardown was performed.
+The five mock runs cover the network/ownership/peering contract, invalid environment, invalid owner, invalid CIDR allocation and the child module's inbound security contract.
+
+Local preparation had been blocked by the runtime's provider socket restriction. The hosted runner resolved that environment limitation without changing the implementation.
+
+These are schema and mocked configuration checks. No Azure subscription was accessed, and no live plan, apply, packet-flow test or teardown was performed.
