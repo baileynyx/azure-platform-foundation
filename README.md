@@ -4,6 +4,10 @@ A small subscription-level Terraform networking foundation: one resource group, 
 
 **This is an independent networking lab, not a complete enterprise landing zone.** It contains no compute, managed firewall, gateway, public IP, or Azure deployment automation. CI validates without cloud credentials.
 
+## Featured engineering case study
+
+[Onboarding a second application team](docs/second-team-case-study.md): how state ownership, address allocation, connectivity approval and recovery would evolve beyond this lab. Includes links to the five passing tests and explicit acceptance gates for the proposed extension.
+
 ## Five-minute review
 
 Install Terraform 1.9 or later (less than 2.0). Provider installation requires internet access.
