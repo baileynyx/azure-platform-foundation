@@ -32,6 +32,10 @@ The first increment passes 20 new Python tests, 12 synthetic evaluation cases an
 13 adversarial response probes. These are **offline contract results**; live model
 quality and reviewer time savings have not been measured. CI uses no AI credentials.
 
+[Provision the optional Azure AI demo with Terraform](examples/ai-service/README.md):
+a separate three-resource root, one-host firewall rule, explicit model version
+and non-secret reviewer outputs. Deployment and inference remain manual.
+
 ## Drift detection and recovery
 
 [Run the local drift rehearsal](docs/drift-rehearsal.md): change a Terraform-managed
