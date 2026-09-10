@@ -86,3 +86,38 @@ jobs:
           path: reports/drift/
           retention-days: 14
           if-no-files-found: error
+
+  ai-review:
+    name: AI review contract (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 5
+    env:
+      # Keep subprocess recordings portable across Windows code pages. This job
+      # deliberately has no model key and cannot claim a live AI evaluation.
+      PYTHONUTF8: '1'
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: '3.12'
+      - name: Test AI privacy, evidence, CLI and intercepted HTTP boundaries
+        run: python -m unittest discover -s tests -p 'test_ai_review.py' -v
+      - name: Evaluate the offline baseline and adversarial response probes
+        run: python evaluate_ai_review.py --output-dir reports/ai-evaluation
+      - name: Record actual CLI output without live inference
+        run: python record_ai_demo.py --output-dir reports/ai-recording
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: ai-review-offline-${{ matrix.os }}-${{ github.run_id }}
+          # Only synthetic fixtures are used; real local plans are never uploaded.
+          path: |
+            reports/ai-evaluation/
+            reports/ai-recording/
+          retention-days: 14
+          if-no-files-found: error

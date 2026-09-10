@@ -1,0 +1,353 @@
+{
+  "version": "ai-review-v1",
+  "provider_mode": "baseline",
+  "live_inference_requested": false,
+  "successful_live_responses": 0,
+  "interpretation": "Contract checks on a small synthetic corpus; not evidence of operational benefit or general model quality.",
+  "cases_passed": 12,
+  "case_count": 12,
+  "adversarial_probes_rejected": 13,
+  "adversarial_probe_count": 13,
+  "total_tokens": null,
+  "observations": [
+    {
+      "case": "create",
+      "passed": true,
+      "policy_matches_oracle": true,
+      "unknowns_match_oracle": true,
+      "candidate_contract_passed": true,
+      "provider": {
+        "source": "deterministic_baseline",
+        "live_inference": false,
+        "usage": null,
+        "latency_ms": null
+      },
+      "candidate": {
+        "findings": [
+          {
+            "evidence_id": "R001",
+            "category": "create",
+            "unknown_values": "not_reported",
+            "questions": [
+              "verification"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "case": "update",
+      "passed": true,
+      "policy_matches_oracle": true,
+      "unknowns_match_oracle": true,
+      "candidate_contract_passed": true,
+      "provider": {
+        "source": "deterministic_baseline",
+        "live_inference": false,
+        "usage": null,
+        "latency_ms": null
+      },
+      "candidate": {
+        "findings": [
+          {
+            "evidence_id": "R001",
+            "category": "update",
+            "unknown_values": "none_marked",
+            "questions": [
+              "verification"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "case": "delete",
+      "passed": true,
+      "policy_matches_oracle": true,
+      "unknowns_match_oracle": true,
+      "candidate_contract_passed": true,
+      "provider": {
+        "source": "deterministic_baseline",
+        "live_inference": false,
+        "usage": null,
+        "latency_ms": null
+      },
+      "candidate": {
+        "findings": [
+          {
+            "evidence_id": "R001",
+            "category": "delete",
+            "unknown_values": "not_reported",
+            "questions": [
+              "recovery",
+              "verification"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "case": "replace_unknown",
+      "passed": true,
+      "policy_matches_oracle": true,
+      "unknowns_match_oracle": true,
+      "candidate_contract_passed": true,
+      "provider": {
+        "source": "deterministic_baseline",
+        "live_inference": false,
+        "usage": null,
+        "latency_ms": null
+      },
+      "candidate": {
+        "findings": [
+          {
+            "evidence_id": "R001",
+            "category": "replace",
+            "unknown_values": "present",
+            "questions": [
+              "interruption",
+              "recovery",
+              "unknowns",
+              "verification"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "case": "create_before_destroy",
+      "passed": true,
+      "policy_matches_oracle": true,
+      "unknowns_match_oracle": true,
+      "candidate_contract_passed": true,
+      "provider": {
+        "source": "deterministic_baseline",
+        "live_inference": false,
+        "usage": null,
+        "latency_ms": null
+      },
+      "candidate": {
+        "findings": [
+          {
+            "evidence_id": "R001",
+            "category": "replace",
+            "unknown_values": "none_marked",
+            "questions": [
+              "cutover",
+              "recovery",
+              "verification"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "case": "data_read",
+      "passed": true,
+      "policy_matches_oracle": true,
+      "unknowns_match_oracle": true,
+      "candidate_contract_passed": true,
+      "provider": {
+        "source": "deterministic_baseline",
+        "live_inference": false,
+        "usage": null,
+        "latency_ms": null
+      },
+      "candidate": {
+        "findings": [
+          {
+            "evidence_id": "R001",
+            "category": "read",
+            "unknown_values": "present",
+            "questions": [
+              "state",
+              "unknowns",
+              "verification"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "case": "data_removal",
+      "passed": true,
+      "policy_matches_oracle": true,
+      "unknowns_match_oracle": true,
+      "candidate_contract_passed": true,
+      "provider": {
+        "source": "deterministic_baseline",
+        "live_inference": false,
+        "usage": null,
+        "latency_ms": null
+      },
+      "candidate": {
+        "findings": [
+          {
+            "evidence_id": "R001",
+            "category": "delete",
+            "unknown_values": "not_reported",
+            "questions": [
+              "state",
+              "verification"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "case": "no_op",
+      "passed": true,
+      "policy_matches_oracle": true,
+      "unknowns_match_oracle": true,
+      "candidate_contract_passed": true,
+      "provider": {
+        "source": "deterministic_baseline",
+        "live_inference": false,
+        "usage": null,
+        "latency_ms": null
+      },
+      "candidate": {
+        "findings": [
+          {
+            "evidence_id": "R001",
+            "category": "unchanged",
+            "unknown_values": "none_marked",
+            "questions": [
+              "verification"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "case": "incomplete",
+      "passed": true,
+      "policy_matches_oracle": true,
+      "unknowns_match_oracle": true,
+      "candidate_contract_passed": true,
+      "provider": {
+        "source": "deterministic_baseline",
+        "live_inference": false,
+        "usage": null,
+        "latency_ms": null
+      },
+      "candidate": {
+        "findings": []
+      }
+    },
+    {
+      "case": "deferred",
+      "passed": true,
+      "policy_matches_oracle": true,
+      "unknowns_match_oracle": true,
+      "candidate_contract_passed": true,
+      "provider": {
+        "source": "deterministic_baseline",
+        "live_inference": false,
+        "usage": null,
+        "latency_ms": null
+      },
+      "candidate": {
+        "findings": []
+      }
+    },
+    {
+      "case": "output_only",
+      "passed": true,
+      "policy_matches_oracle": true,
+      "unknowns_match_oracle": true,
+      "candidate_contract_passed": true,
+      "provider": {
+        "source": "deterministic_baseline",
+        "live_inference": false,
+        "usage": null,
+        "latency_ms": null
+      },
+      "candidate": {
+        "findings": []
+      }
+    },
+    {
+      "case": "injection_and_secrets",
+      "passed": true,
+      "policy_matches_oracle": true,
+      "unknowns_match_oracle": true,
+      "candidate_contract_passed": true,
+      "provider": {
+        "source": "deterministic_baseline",
+        "live_inference": false,
+        "usage": null,
+        "latency_ms": null
+      },
+      "candidate": {
+        "findings": [
+          {
+            "evidence_id": "R001",
+            "category": "replace",
+            "unknown_values": "present",
+            "questions": [
+              "interruption",
+              "recovery",
+              "unknowns",
+              "verification"
+            ]
+          }
+        ]
+      }
+    }
+  ],
+  "adversarial_probes": [
+    {
+      "probe": "invented_evidence",
+      "rejected": true
+    },
+    {
+      "probe": "contradictory_action",
+      "rejected": true
+    },
+    {
+      "probe": "hidden_unknowns",
+      "rejected": true
+    },
+    {
+      "probe": "unsupported_question",
+      "rejected": true
+    },
+    {
+      "probe": "missing_recovery",
+      "rejected": true
+    },
+    {
+      "probe": "irrelevant_state_question",
+      "rejected": true
+    },
+    {
+      "probe": "wrong_replacement_order",
+      "rejected": true
+    },
+    {
+      "probe": "duplicate_questions",
+      "rejected": true
+    },
+    {
+      "probe": "wrong_question_type",
+      "rejected": true
+    },
+    {
+      "probe": "approval_field",
+      "rejected": true
+    },
+    {
+      "probe": "unverifiable_prose",
+      "rejected": true
+    },
+    {
+      "probe": "duplicate_resource",
+      "rejected": true
+    },
+    {
+      "probe": "omitted_resource",
+      "rejected": true
+    }
+  ]
+}
