@@ -21,6 +21,18 @@ Azure action fixtures and real Terraform-generated plans using temporary local
 `terraform_data` state. No Azure credentials are used. A passing review means
 this narrow action policy found no destructive changes, not approval to apply.
 
+## Drift detection and recovery
+
+[Run the local drift rehearsal](docs/drift-rehearsal.md): change a Terraform-managed
+file outside Terraform, detect the difference without repairing it, then opt in
+to a checked saved-plan recovery and verify a clean plan and teardown. CI exercises
+both observation-only and recovery modes and retains JSON/Markdown evidence.
+The fixture uses the locked local provider in temporary state; it creates no Azure resources.
+
+```shell
+python rehearse_drift.py --recover-local-fixture --output-dir reports/drift-demo
+```
+
 ## Five-minute review
 
 Install Terraform 1.9 or later (less than 2.0). Provider installation requires internet access.

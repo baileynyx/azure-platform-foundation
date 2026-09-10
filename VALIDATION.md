@@ -1,5 +1,25 @@
 # Validation
 
+## Local drift rehearsal
+
+September 10, 2026: all **27 Python tests** passed locally (19 plan-review tests
+and 8 drift-rehearsal boundary tests). The new tests reject configuration-only
+changes masquerading as drift, Terraform error exit 1, unexpected recovery
+actions/resources/paths/content, unknown values, unsupported or errored plans,
+and reuse of an existing evidence directory.
+
+The local full rehearsal attempt stopped when the runtime could not start the
+local provider process; it did not produce a passing rehearsal report. The
+hosted `drift-rehearsal` job is configured to execute actual Terraform detection
+and recovery with Terraform 1.9.8 and the locked local provider 2.5.3. Its two
+modes must be checked on the PR's exact commit before claiming hosted success.
+
+Expected assertions include observed drift separate from planned actions,
+unchanged persisted state/file during detection, fixture-specific recovery
+checks, restored bytes, a clean plan and verified Terraform teardown. Reports
+contain selected evidence and hashes, while full plans/state remain temporary.
+See the [walkthrough, expected results and scope](docs/drift-rehearsal.md).
+
 ## Terraform plan review increment
 
 Local Python validation passed **19 tests** for the new action reviewer. They
