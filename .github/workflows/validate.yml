@@ -57,3 +57,32 @@ jobs:
           path: reports/plan-review/
           retention-days: 14
           if-no-files-found: error
+  drift-rehearsal:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: '3.12'
+      - uses: hashicorp/setup-terraform@dfe3c3f87815947d99a8997f908cb6525fc44e9e # v4.0.1
+        with:
+          terraform_version: '1.9.8'
+          # The rehearsal checks native 0/1/2 codes and parses show -json itself.
+          terraform_wrapper: false
+      - name: Observe local drift without recovery
+        run: python rehearse_drift.py --output-dir reports/drift/detection
+      - name: Rehearse checked local recovery and teardown
+        run: python rehearse_drift.py --recover-local-fixture --output-dir reports/drift/recovery
+      - name: Publish the observed drift and recovery summary
+        run: cat reports/drift/recovery/drift-report.md >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        if: always()
+        with:
+          name: terraform-drift-rehearsal-${{ github.run_id }}-${{ github.run_attempt }}
+          # This directory contains only selected JSON/Markdown evidence. Full
+          # Terraform state and saved plans remain in the deleted temporary root.
+          path: reports/drift/
+          retention-days: 14
+          if-no-files-found: error
