@@ -1,5 +1,23 @@
 # Validation
 
+## Terraform plan review increment
+
+Local Python validation passed **19 tests** for the new action reviewer. They
+cover deletion, both replacement orders, safe actions, invalid/unsupported input,
+incomplete and deferred plans, deposed objects, omission of sensitive attribute
+values, Markdown escaping and public CLI exit codes/report behavior.
+
+The synthetic examples return 0 for no destructive actions and 1 for one deletion
+plus two replacements. The committed sample report is generated from that fixture.
+Terraform is unavailable in the local preparation environment, so no local
+Terraform execution is claimed for this increment.
+
+CI runs the existing 17 Terraform mock tests and a separate plan-review job. Its
+real Terraform contract check uses built-in `terraform_data` in temporary local
+state for create/no-op/replace/destroy plans. Inspect the exact PR run before
+claiming that hosted check passed. It does not access Azure or run a live network
+test. [Walkthrough and limits](docs/plan-review.md).
+
 ## Optional second-team increment
 
 The implementation adds 12 plan-only mock runs in `tests/two_teams.tftest.hcl`, alongside the five original runs. They exercise default-off behavior, onboarding without changing Team A/hub configuration, separate owner tags, the shared deny baseline, both peerings, an alternate allocation, disabling Team B, and invalid owner/allocation inputs.

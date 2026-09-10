@@ -19,3 +19,41 @@ jobs:
       - run: terraform init -backend=false -input=false -lockfile=readonly
       - run: terraform validate
       - run: terraform test
+  plan-review:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: '3.12'
+      - uses: hashicorp/setup-terraform@dfe3c3f87815947d99a8997f908cb6525fc44e9e # v4.0.1
+        with:
+          terraform_version: '1.9.8'
+          # Python captures raw show -json output and real process exit codes.
+          terraform_wrapper: false
+      - name: Test the plan review policy and public CLI
+        run: python -m unittest discover -s tests -p 'test_*.py' -v
+      - name: Demonstrate synthetic Azure plan decisions
+        run: |
+          python plan_review.py examples/plans/safe.json --output reports/plan-review/safe.md
+          # Only the documented review-required exit is expected. A crash or
+          # invalid input must fail CI instead of masquerading as a blocked plan.
+          if python plan_review.py examples/plans/destructive.json --output reports/plan-review/destructive.md; then
+            echo 'Destructive fixture unexpectedly passed.'
+            exit 1
+          else
+            status=$?
+            test "$status" -eq 1
+          fi
+          cat reports/plan-review/safe.md reports/plan-review/destructive.md >> "$GITHUB_STEP_SUMMARY"
+      - name: Check real Terraform JSON with temporary local state
+        run: python check_plan_contract.py
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        if: always()
+        with:
+          name: terraform-plan-review-${{ github.run_id }}-${{ github.run_attempt }}
+          path: reports/plan-review/
+          retention-days: 14
+          if-no-files-found: error
