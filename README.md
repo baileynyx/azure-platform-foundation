@@ -21,6 +21,17 @@ Azure action fixtures and real Terraform-generated plans using temporary local
 `terraform_data` state. No Azure credentials are used. A passing review means
 this narrow action policy found no destructive changes, not approval to apply.
 
+## AI assisted review questions
+
+[Try the AI-assisted Terraform reviewer](docs/ai-review.md): a limited plan
+projection, evidence-linked explanations, a constrained review-question catalogue,
+and an optional Azure model adapter. The existing deterministic policy retains
+control of the decision. [Read the recorded offline demo](docs/ai/recorded-demo/transcript.txt).
+
+The first increment passes 20 new Python tests, 12 synthetic evaluation cases and
+13 adversarial response probes. These are **offline contract results**; live model
+quality and reviewer time savings have not been measured. CI uses no AI credentials.
+
 ## Drift detection and recovery
 
 [Run the local drift rehearsal](docs/drift-rehearsal.md): change a Terraform-managed

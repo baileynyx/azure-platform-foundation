@@ -58,3 +58,20 @@ The five mock runs cover the network/ownership/peering contract, invalid environ
 Local preparation had been blocked by the runtime's provider socket restriction. The hosted runner resolved that environment limitation without changing the implementation.
 
 These are schema and mocked configuration checks. No Azure subscription was accessed, and no live plan, apply, packet-flow test or teardown was performed.
+
+
+## AI assisted review increment
+
+Locally executed for this increment on 2026-09-10:
+
+- All 47 Python tests passed: 27 existing tests plus 20 AI boundary/CLI/transport tests.
+- The deterministic baseline passed all 12 synthetic corpus cases.
+- All 13 deliberately invalid response probes were rejected.
+- Recorded real CLI output from the destructive review (expected exit 1) and evaluation (exit 0).
+- Azure HTTP tests intercepted requests locally; they did not call a model.
+
+See [the walkthrough and limits](docs/ai-review.md) and
+[the recorded evaluation](docs/ai/recorded-demo/evaluation.json).
+Hosted Windows/Linux AI validation is configured in the PR. Its result must be
+checked on that PR; this note does not claim a hosted run before it completes.
+No live model inference, model quality measurement or Azure deployment was performed.
