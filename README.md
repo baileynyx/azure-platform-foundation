@@ -12,6 +12,15 @@ A small subscription-level Terraform networking foundation: one resource group, 
 
 [Onboarding a second application team](docs/second-team-case-study.md): the implemented second-spoke increment, its regression evidence, and the state ownership, connectivity approval and recovery work still required for a team-operated platform.
 
+## Terraform change review
+
+[Review planned deletions and replacements](docs/plan-review.md) with a Python CLI
+that returns an explicit review-required exit and writes a Markdown report.
+[See the destructive example](docs/plan-review-example.md). CI checks synthetic
+Azure action fixtures and real Terraform-generated plans using temporary local
+`terraform_data` state. No Azure credentials are used. A passing review means
+this narrow action policy found no destructive changes, not approval to apply.
+
 ## Five-minute review
 
 Install Terraform 1.9 or later (less than 2.0). Provider installation requires internet access.
