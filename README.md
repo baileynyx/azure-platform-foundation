@@ -32,7 +32,11 @@ control of the decision. [Read the recorded offline demo](docs/ai/recorded-demo/
 subscription. The Windows walkthrough starts with a small model and a synthetic
 plan, then records local evaluation evidence.
 
-The AI suites include 36 Python tests, 12 synthetic baseline evaluation cases and
+[Capture a local AI review walkthrough](docs/ollama-recording.md): record one
+real Ollama attempt with its transcript, original reports and source/timing
+metadata. This is a recording procedure; a live capture has not yet been published.
+
+The AI suites include 47 Python tests, 12 synthetic baseline evaluation cases and
 13 adversarial response probes. These automated checks are **offline contract
 results**; CI uses no AI credentials.
 

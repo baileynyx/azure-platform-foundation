@@ -177,6 +177,11 @@ are ignored by Git; review them before choosing to publish any results.
 
 ## Troubleshooting and cleanup
 
+To capture a portfolio walkthrough after the single review works, follow
+[Record a local AI review walkthrough](ollama-recording.md). The separate recorder
+retains a transcript, timed terminal recording, original reports and attempt
+metadata. It preserves failures and uses a new output directory for every attempt.
+
 - **Command not found:** reopen PowerShell after installing Ollama; verify it is
   available before copying the next command.
 - **Local inference failed:** open Ollama, check `ollama list`, close memory-heavy
