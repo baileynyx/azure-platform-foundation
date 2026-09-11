@@ -10,8 +10,10 @@ contract success must be measured on the machine. Close memory-heavy application
 first. Do not install Kubernetes or a container stack for this demo.
 
 **Evidence status:** automated tests intercept HTTP and use synthetic responses.
-They do not run Ollama or establish model quality. The committed recording remains
-an offline baseline. A user-run review of the destructive fixture on Ollama 0.34.0
+They do not run Ollama or establish model quality. The original recording is
+an offline baseline; a separate [captured local Ollama run](ai/local-recording/README.md)
+now preserves a four-resource review and its actual environment and timings.
+A user-run review of the destructive fixture on Ollama 0.34.0
 with `qwen2.5:3b` returned JSON but failed the question contract: it added
 `interruption` to the create-before-delete resource and used `cutover` instead of
 `interruption` for the delete-before-create resource. The validator rejected both

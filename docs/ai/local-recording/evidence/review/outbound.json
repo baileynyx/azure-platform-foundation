@@ -1,0 +1,43 @@
+{
+  "version": "ai-review-v1",
+  "evidence": [
+    {
+      "evidence_id": "R001",
+      "mode": "managed",
+      "actions": [
+        "create",
+        "delete"
+      ],
+      "category": "replace",
+      "unknown_values": "not_reported"
+    },
+    {
+      "evidence_id": "R002",
+      "mode": "managed",
+      "actions": [
+        "no-op"
+      ],
+      "category": "unchanged",
+      "unknown_values": "not_reported"
+    },
+    {
+      "evidence_id": "R003",
+      "mode": "managed",
+      "actions": [
+        "delete"
+      ],
+      "category": "delete",
+      "unknown_values": "not_reported"
+    },
+    {
+      "evidence_id": "R004",
+      "mode": "managed",
+      "actions": [
+        "delete",
+        "create"
+      ],
+      "category": "replace",
+      "unknown_values": "not_reported"
+    }
+  ]
+}

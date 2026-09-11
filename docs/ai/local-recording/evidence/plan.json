@@ -1,0 +1,46 @@
+{
+  "format_version": "1.2",
+  "terraform_version": "1.9.8",
+  "planned_values": {},
+  "configuration": {},
+  "resource_changes": [
+    {
+      "address": "module.team_b[\"team_b\"].azurerm_subnet.workload",
+      "mode": "managed",
+      "change": {
+        "actions": [
+          "delete"
+        ]
+      }
+    },
+    {
+      "address": "module.team_b[\"team_b\"].azurerm_virtual_network.this",
+      "mode": "managed",
+      "change": {
+        "actions": [
+          "delete",
+          "create"
+        ]
+      }
+    },
+    {
+      "address": "azurerm_virtual_network_peering.hub_to_team_b[\"team_b\"]",
+      "mode": "managed",
+      "change": {
+        "actions": [
+          "create",
+          "delete"
+        ]
+      }
+    },
+    {
+      "address": "module.hub.azurerm_virtual_network.this",
+      "mode": "managed",
+      "change": {
+        "actions": [
+          "no-op"
+        ]
+      }
+    }
+  ]
+}

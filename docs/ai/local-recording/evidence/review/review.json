@@ -1,0 +1,197 @@
+{
+  "version": "ai-review-v1",
+  "advisory_only": true,
+  "projection": {
+    "version": "ai-review-v1",
+    "evidence": [
+      {
+        "evidence_id": "R001",
+        "mode": "managed",
+        "actions": [
+          "create",
+          "delete"
+        ],
+        "category": "replace",
+        "unknown_values": "not_reported"
+      },
+      {
+        "evidence_id": "R002",
+        "mode": "managed",
+        "actions": [
+          "no-op"
+        ],
+        "category": "unchanged",
+        "unknown_values": "not_reported"
+      },
+      {
+        "evidence_id": "R003",
+        "mode": "managed",
+        "actions": [
+          "delete"
+        ],
+        "category": "delete",
+        "unknown_values": "not_reported"
+      },
+      {
+        "evidence_id": "R004",
+        "mode": "managed",
+        "actions": [
+          "delete",
+          "create"
+        ],
+        "category": "replace",
+        "unknown_values": "not_reported"
+      }
+    ]
+  },
+  "gate": {
+    "status": "review_required",
+    "sha256": "752e131164f2b2513b9fb380dbc2c06b82d597ad5510821d33b677d2cbfe9f4a",
+    "counts": {
+      "unchanged": 1,
+      "create": 0,
+      "read": 0,
+      "update": 0,
+      "delete": 1,
+      "replace": 2
+    },
+    "findings": [],
+    "resources": [
+      {
+        "address": "azurerm_virtual_network_peering.hub_to_team_b[\"team_b\"]",
+        "deposed": "",
+        "mode": "managed",
+        "actions": [
+          "create",
+          "delete"
+        ],
+        "category": "replace",
+        "reason": "Create before destroy still removes the old object: review cutover, capacity and recovery."
+      },
+      {
+        "address": "module.hub.azurerm_virtual_network.this",
+        "deposed": "",
+        "mode": "managed",
+        "actions": [
+          "no-op"
+        ],
+        "category": "unchanged",
+        "reason": null
+      },
+      {
+        "address": "module.team_b[\"team_b\"].azurerm_subnet.workload",
+        "deposed": "",
+        "mode": "managed",
+        "actions": [
+          "delete"
+        ],
+        "category": "delete",
+        "reason": "Object removal: review dependents, retained data and recovery before proceeding."
+      },
+      {
+        "address": "module.team_b[\"team_b\"].azurerm_virtual_network.this",
+        "deposed": "",
+        "mode": "managed",
+        "actions": [
+          "delete",
+          "create"
+        ],
+        "category": "replace",
+        "reason": "Destroy before create: review interruption, dependent resources and recovery."
+      }
+    ]
+  },
+  "evidence_map": {
+    "R001": {
+      "address": "azurerm_virtual_network_peering.hub_to_team_b[\"team_b\"]",
+      "deposed": "",
+      "json_pointer": "/resource_changes/2/change"
+    },
+    "R002": {
+      "address": "module.hub.azurerm_virtual_network.this",
+      "deposed": "",
+      "json_pointer": "/resource_changes/3/change"
+    },
+    "R003": {
+      "address": "module.team_b[\"team_b\"].azurerm_subnet.workload",
+      "deposed": "",
+      "json_pointer": "/resource_changes/0/change"
+    },
+    "R004": {
+      "address": "module.team_b[\"team_b\"].azurerm_virtual_network.this",
+      "deposed": "",
+      "json_pointer": "/resource_changes/1/change"
+    }
+  },
+  "provider": {
+    "source": "ollama",
+    "live_inference": true,
+    "model": "qwen2.5:3b",
+    "request_version": "ollama-review-v3",
+    "installed_manifest_digest": "357c53fb659c5076de1d65ccb0b397446227b71a42be9d1603d46168015c9e4b",
+    "options": {
+      "temperature": 0,
+      "seed": 42,
+      "num_ctx": 8192,
+      "num_predict": 2048
+    },
+    "latency_ms": 60047,
+    "request_bytes": 8360,
+    "durations_ns": {
+      "total_duration": 60034292500,
+      "load_duration": 4606682100,
+      "prompt_eval_duration": 30463390000,
+      "eval_duration": 24949259000
+    },
+    "usage": {
+      "prompt_tokens": 1432,
+      "completion_tokens": 256,
+      "total_tokens": 1688
+    }
+  },
+  "response": {
+    "findings": [
+      {
+        "evidence_id": "R001",
+        "category": "replace",
+        "unknown_values": "not_reported",
+        "questions": [
+          "cutover",
+          "dependencies",
+          "recovery",
+          "verification"
+        ]
+      },
+      {
+        "evidence_id": "R002",
+        "category": "unchanged",
+        "unknown_values": "not_reported",
+        "questions": [
+          "dependencies",
+          "verification"
+        ]
+      },
+      {
+        "evidence_id": "R003",
+        "category": "delete",
+        "unknown_values": "not_reported",
+        "questions": [
+          "dependencies",
+          "recovery",
+          "verification"
+        ]
+      },
+      {
+        "evidence_id": "R004",
+        "category": "replace",
+        "unknown_values": "not_reported",
+        "questions": [
+          "dependencies",
+          "interruption",
+          "recovery",
+          "verification"
+        ]
+      }
+    ]
+  }
+}
