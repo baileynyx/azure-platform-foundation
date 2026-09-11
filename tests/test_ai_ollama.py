@@ -75,12 +75,66 @@ class OllamaTests(unittest.TestCase):
         for marker in (b'SECRET', b'IGNORE', b'password', b'azurerm', b'module.'):
             self.assertNotIn(marker, request.data)
         metadata = result['provider']
+        self.assertEqual(metadata['request_version'], 'ollama-review-v2')
         self.assertEqual(metadata['installed_manifest_digest'], DIGEST)
         self.assertEqual(metadata['usage']['total_tokens'], 150)
         self.assertEqual(metadata['durations_ns']['eval_duration'], 700000)
         self.assertGreaterEqual(metadata['latency_ms'], 0)
         self.assertTrue(metadata['live_inference'])
         self.assertNotIn('no live model was called', ai.markdown(result))
+
+    def test_request_distinguishes_both_replacement_orders(self):
+        # Inspect bytes sent through the real adapter, rather than testing only
+        # the helper rules. Expected lists are authored for the reported fixture.
+        raw = (ROOT / 'examples/plans/destructive.json').read_bytes()
+        projection, _ = ai.prepare(raw)
+        with patch('urllib.request.OpenerDirector.open', side_effect=[
+                response(tags()), response(envelope(ai.baseline(projection)))]) as network:
+            ai.run_review(raw, 'ollama')
+        body = json.loads(network.call_args.args[0].data)
+        submitted = json.loads(body['messages'][1]['content'])
+        self.assertEqual(submitted['input'], projection)
+        self.assertEqual(submitted['request_version'], 'ollama-review-v2')
+        self.assertEqual(submitted['question_constraints'], [
+            {'evidence_id': 'R001',
+             'allowed_questions': ['cutover', 'dependencies', 'recovery', 'verification'],
+             'required_questions': ['cutover', 'recovery']},
+            {'evidence_id': 'R002', 'allowed_questions': ['dependencies', 'verification'],
+             'required_questions': []},
+            {'evidence_id': 'R003', 'allowed_questions': ['dependencies', 'recovery', 'verification'],
+             'required_questions': ['recovery']},
+            {'evidence_id': 'R004',
+             'allowed_questions': ['dependencies', 'interruption', 'recovery', 'verification'],
+             'required_questions': ['interruption', 'recovery']},
+        ])
+
+    def test_reported_replacement_confusion_remains_rejected(self):
+        # Reproduce the user-reported Qwen response. Also isolate each faulty
+        # finding so rejection of R001 cannot mask a regression in R004 checks.
+        raw = (ROOT / 'examples/plans/destructive.json').read_bytes()
+        valid = {'findings': [
+            {'evidence_id': 'R001', 'category': 'replace', 'unknown_values': 'not_reported',
+             'questions': ['recovery', 'cutover']},
+            {'evidence_id': 'R002', 'category': 'unchanged', 'unknown_values': 'not_reported',
+             'questions': ['verification']},
+            {'evidence_id': 'R003', 'category': 'delete', 'unknown_values': 'not_reported',
+             'questions': ['recovery']},
+            {'evidence_id': 'R004', 'category': 'replace', 'unknown_values': 'not_reported',
+             'questions': ['recovery', 'interruption']},
+        ]}
+        for faulty_indices in ([0], [3], [0, 3]):
+            candidate = json.loads(json.dumps(valid))
+            for index in faulty_indices:
+                candidate['findings'][index]['questions'] = (
+                    ['recovery', 'cutover', 'interruption'] if index == 0 else ['recovery', 'cutover'])
+            with self.subTest(faulty_indices=faulty_indices), patch(
+                    'urllib.request.OpenerDirector.open', side_effect=[response(tags()), response(envelope(candidate))]):
+                with self.assertRaises(ai.ReviewError):
+                    ai.run_review(raw, 'ollama')
+        # Accept a manually authored valid candidate as a validator control.
+        # This is synthetic evidence, not a claim that the model was corrected.
+        with patch('urllib.request.OpenerDirector.open', side_effect=[response(tags()), response(envelope(valid))]):
+            self.assertEqual(ai.run_review(raw, 'ollama')['gate']['status'], 'review_required')
 
     def test_invalid_or_cloud_model_names_never_connect(self):
         for model in ('qwen2.5:3b-cloud', 'https://evil.invalid', '../qwen', '', 'other:latest'):

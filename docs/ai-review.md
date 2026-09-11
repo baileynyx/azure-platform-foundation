@@ -6,9 +6,11 @@ facts and policy decisions? It extends the existing Terraform action reviewer
 with a Python CLI, local Ollama and Azure OpenAI v1 adapters, an evaluation corpus and a recorded
 offline demonstration.
 
-**Current evidence is offline.** The baseline, adversarial probes and intercepted
-HTTP tests pass. Neither adapter has a recorded real model run yet, so there is no claim
-of measured model quality, reviewer time savings or production readiness.
+**Automated evidence is offline.** The baseline, adversarial probes and intercepted
+HTTP tests pass. A user-run local Qwen review was rejected for confusing replacement
+orders; the [Ollama walkthrough](ollama-review.md) documents the revised request.
+No successful live corpus evaluation, reviewer time savings or production
+readiness is claimed.
 
 For real local inference without an Azure subscription, follow the
 [Windows Ollama walkthrough](ollama-review.md). The commands below use the
