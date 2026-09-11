@@ -97,6 +97,10 @@ future blinded reviewer comparison; this release makes no superiority claim.
 
 ## Optional live Azure review
 
+If you do not have an Azure OpenAI resource yet, use the
+[isolated Terraform setup](../examples/ai-service/README.md). It includes
+subscription/model checks, a host firewall rule, plan review and teardown.
+
 Use an existing public Azure OpenAI resource and a deployment supporting chat
 completions with strict JSON-schema output. No resource is provisioned by this
 project. Live mode makes a paid inference request, subject to that deployment's
