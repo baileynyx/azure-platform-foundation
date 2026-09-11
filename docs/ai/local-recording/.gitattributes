@@ -1,0 +1,2 @@
+# Preserve uploaded evidence bytes so recorded SHA-256 hashes survive checkout.
+evidence/** -text

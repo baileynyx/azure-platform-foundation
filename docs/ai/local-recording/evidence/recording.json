@@ -1,0 +1,59 @@
+{
+  "version": "ollama-demo-v1",
+  "status": "passed",
+  "started_at": "2026-09-11T07:50:11.663741+00:00",
+  "python_version": "3.11.9",
+  "os": {
+    "system": "Windows",
+    "release": "10",
+    "version": "10.0.26200",
+    "machine": "AMD64"
+  },
+  "source": {
+    "commit": "978b277a7655f3c15775c894d5a7761614b6215b",
+    "dirty": false,
+    "sha256": {
+      "record_ollama_demo.py": "06e0bd1ef009d45153b514f1a8c15f7c578e99ce81c90fa203526a6dd995164e",
+      "ai_review.py": "48fbf575e39c5f64d8fba6450caa37a76bfbbb8d132344835a9a6a15000beb07",
+      "plan_review.py": "04052f697e496670a3c124ef840568e28932cdebb29bc518127f10e744733b72",
+      "examples/plans/destructive.json": "752e131164f2b2513b9fb380dbc2c06b82d597ad5510821d33b677d2cbfe9f4a"
+    }
+  },
+  "review_exit": 1,
+  "review_wall_seconds": 60.203,
+  "provider": {
+    "source": "ollama",
+    "live_inference": true,
+    "model": "qwen2.5:3b",
+    "request_version": "ollama-review-v3",
+    "installed_manifest_digest": "357c53fb659c5076de1d65ccb0b397446227b71a42be9d1603d46168015c9e4b",
+    "options": {
+      "temperature": 0,
+      "seed": 42,
+      "num_ctx": 8192,
+      "num_predict": 2048
+    },
+    "latency_ms": 60047,
+    "request_bytes": 8360,
+    "durations_ns": {
+      "total_duration": 60034292500,
+      "load_duration": 4606682100,
+      "prompt_eval_duration": 30463390000,
+      "eval_duration": 24949259000
+    },
+    "usage": {
+      "prompt_tokens": 1432,
+      "completion_tokens": 256,
+      "total_tokens": 1688
+    }
+  },
+  "recording_seconds": 60.375,
+  "artifact_sha256": {
+    "plan.json": "752e131164f2b2513b9fb380dbc2c06b82d597ad5510821d33b677d2cbfe9f4a",
+    "demo.cast": "32edca4c9b02bf4ca9204b35baca8cdca8746c1de08e7455eca2332f2cc3bfb7",
+    "transcript.txt": "448c173da158b080e5766674789a033d91c9605440c347f4e2e4ff8939a178db",
+    "review/review.json": "d6dd2a9cb5fe2302f72ffeddfdeb0a572a5096541d84b25b9557e19bf0ae8515",
+    "review/review.md": "42b18ad2b5fd3cdf283ec8d11e4b105dbcd2173da773ad3bc2ad5f047568e470",
+    "review/outbound.json": "fd49cf8dde827772a66e1e8540a394f6bb2d26dd994bd9993f17e69eecc49c39"
+  }
+}

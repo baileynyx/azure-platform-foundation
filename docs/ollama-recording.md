@@ -6,8 +6,10 @@ original review files. No screen-recording software or extra Python packages are
 required. It runs on Windows or Linux with Python 3.12+ and the existing local
 Ollama installation described in [the setup guide](ollama-review.md).
 
-**Evidence status:** this page supplies the recording procedure. A live recording
-has not yet been published. CI intercepts subprocesses to test the recorder;
+**Evidence status:** [a captured local run](ai/local-recording/README.md) now
+preserves the original transcript, recording, reports and source/timing metadata.
+It passed on the user's Python 3.11.9 installation; the documented and CI baseline
+remains Python 3.12+. CI intercepts subprocesses to test the recorder;
 those synthetic test responses are not live inference evidence. The earlier
 [12-case local evaluation](ai/local-evaluation/README.md) and
 [offline baseline recording](ai/recorded-demo/transcript.txt) remain separate.

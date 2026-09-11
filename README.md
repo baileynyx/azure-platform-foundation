@@ -32,9 +32,12 @@ control of the decision. [Read the recorded offline demo](docs/ai/recorded-demo/
 subscription. The Windows walkthrough starts with a small model and a synthetic
 plan, then records local evaluation evidence.
 
-[Capture a local AI review walkthrough](docs/ollama-recording.md): record one
-real Ollama attempt with its transcript, original reports and source/timing
-metadata. This is a recording procedure; a live capture has not yet been published.
+[Read the captured local AI walkthrough](docs/ai/local-recording/README.md): one
+four-resource Qwen 2.5 3B review retained complete evidence and required human
+review, with **60.203 seconds of CLI wall time** and **1,688 tokens**. The original
+transcript, timed recording and reports are preserved, including the recorded
+Python 3.11.9 environment (CI targets 3.12).
+[Capture your own attempt](docs/ollama-recording.md).
 
 The AI suites include 47 Python tests, 12 synthetic baseline evaluation cases and
 13 adversarial response probes. These automated checks are **offline contract
