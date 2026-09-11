@@ -107,7 +107,7 @@ jobs:
         with:
           python-version: '3.12'
       - name: Test AI privacy, evidence, CLI and intercepted HTTP boundaries
-        run: python -m unittest discover -s tests -p 'test_ai_review.py' -v
+        run: python -m unittest discover -s tests -p 'test_ai*.py' -v
       - name: Evaluate the offline baseline and adversarial response probes
         run: python evaluate_ai_review.py --output-dir reports/ai-evaluation
       - name: Record actual CLI output without live inference

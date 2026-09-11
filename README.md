@@ -25,10 +25,14 @@ this narrow action policy found no destructive changes, not approval to apply.
 
 [Try the AI-assisted Terraform reviewer](docs/ai-review.md): a limited plan
 projection, evidence-linked explanations, a constrained review-question catalogue,
-and an optional Azure model adapter. The existing deterministic policy retains
+and optional local Ollama and Azure model adapters. The existing deterministic policy retains
 control of the decision. [Read the recorded offline demo](docs/ai/recorded-demo/transcript.txt).
 
-The first increment passes 20 new Python tests, 12 synthetic evaluation cases and
+[Run a real model locally with Ollama](docs/ollama-review.md) without an Azure
+subscription. The Windows walkthrough starts with a small model and a synthetic
+plan, then records local evaluation evidence.
+
+The AI suites include 31 Python tests, 12 synthetic baseline evaluation cases and
 13 adversarial response probes. These are **offline contract results**; live model
 quality and reviewer time savings have not been measured. CI uses no AI credentials.
 
