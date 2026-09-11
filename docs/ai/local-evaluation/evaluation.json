@@ -1,0 +1,598 @@
+{
+  "version": "ai-review-v1",
+  "provider_mode": "ollama",
+  "live_inference_requested": true,
+  "successful_live_responses": 12,
+  "interpretation": "Contract checks on a small synthetic corpus; not evidence of operational benefit or general model quality.",
+  "cases_passed": 12,
+  "case_count": 12,
+  "adversarial_probes_rejected": 13,
+  "adversarial_probe_count": 13,
+  "total_tokens": 8946,
+  "observations": [
+    {
+      "case": "create",
+      "passed": true,
+      "policy_matches_oracle": true,
+      "unknowns_match_oracle": true,
+      "candidate_contract_passed": true,
+      "provider": {
+        "source": "ollama",
+        "live_inference": true,
+        "model": "qwen2.5:3b",
+        "request_version": "ollama-review-v3",
+        "installed_manifest_digest": "357c53fb659c5076de1d65ccb0b397446227b71a42be9d1603d46168015c9e4b",
+        "options": {
+          "temperature": 0,
+          "seed": 42,
+          "num_ctx": 8192,
+          "num_predict": 2048
+        },
+        "latency_ms": 22375,
+        "request_bytes": 4299,
+        "durations_ns": {
+          "total_duration": 22363782900,
+          "load_duration": 3093271900,
+          "prompt_eval_duration": 13888379000,
+          "eval_duration": 5372479000
+        },
+        "usage": {
+          "prompt_tokens": 730,
+          "completion_tokens": 65,
+          "total_tokens": 795
+        }
+      },
+      "candidate": {
+        "findings": [
+          {
+            "evidence_id": "R001",
+            "category": "create",
+            "unknown_values": "not_reported",
+            "questions": [
+              "dependencies",
+              "verification"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "case": "update",
+      "passed": true,
+      "policy_matches_oracle": true,
+      "unknowns_match_oracle": true,
+      "candidate_contract_passed": true,
+      "provider": {
+        "source": "ollama",
+        "live_inference": true,
+        "model": "qwen2.5:3b",
+        "request_version": "ollama-review-v3",
+        "installed_manifest_digest": "357c53fb659c5076de1d65ccb0b397446227b71a42be9d1603d46168015c9e4b",
+        "options": {
+          "temperature": 0,
+          "seed": 42,
+          "num_ctx": 8192,
+          "num_predict": 2048
+        },
+        "latency_ms": 17140,
+        "request_bytes": 4296,
+        "durations_ns": {
+          "total_duration": 17133374200,
+          "load_duration": 3334400,
+          "prompt_eval_duration": 9819753000,
+          "eval_duration": 7281863000
+        },
+        "usage": {
+          "prompt_tokens": 730,
+          "completion_tokens": 65,
+          "total_tokens": 795
+        }
+      },
+      "candidate": {
+        "findings": [
+          {
+            "evidence_id": "R001",
+            "category": "update",
+            "unknown_values": "none_marked",
+            "questions": [
+              "dependencies",
+              "verification"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "case": "delete",
+      "passed": true,
+      "policy_matches_oracle": true,
+      "unknowns_match_oracle": true,
+      "candidate_contract_passed": true,
+      "provider": {
+        "source": "ollama",
+        "live_inference": true,
+        "model": "qwen2.5:3b",
+        "request_version": "ollama-review-v3",
+        "installed_manifest_digest": "357c53fb659c5076de1d65ccb0b397446227b71a42be9d1603d46168015c9e4b",
+        "options": {
+          "temperature": 0,
+          "seed": 42,
+          "num_ctx": 8192,
+          "num_predict": 2048
+        },
+        "latency_ms": 14360,
+        "request_bytes": 4351,
+        "durations_ns": {
+          "total_duration": 14365368600,
+          "load_duration": 3274300,
+          "prompt_eval_duration": 9275724000,
+          "eval_duration": 5058565000
+        },
+        "usage": {
+          "prompt_tokens": 741,
+          "completion_tokens": 62,
+          "total_tokens": 803
+        }
+      },
+      "candidate": {
+        "findings": [
+          {
+            "evidence_id": "R001",
+            "category": "delete",
+            "unknown_values": "not_reported",
+            "questions": [
+              "recovery"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "case": "replace_unknown",
+      "passed": true,
+      "policy_matches_oracle": true,
+      "unknowns_match_oracle": true,
+      "candidate_contract_passed": true,
+      "provider": {
+        "source": "ollama",
+        "live_inference": true,
+        "model": "qwen2.5:3b",
+        "request_version": "ollama-review-v3",
+        "installed_manifest_digest": "357c53fb659c5076de1d65ccb0b397446227b71a42be9d1603d46168015c9e4b",
+        "options": {
+          "temperature": 0,
+          "seed": 42,
+          "num_ctx": 8192,
+          "num_predict": 2048
+        },
+        "latency_ms": 16188,
+        "request_bytes": 4475,
+        "durations_ns": {
+          "total_duration": 16187828400,
+          "load_duration": 3376600,
+          "prompt_eval_duration": 9812699000,
+          "eval_duration": 6349483000
+        },
+        "usage": {
+          "prompt_tokens": 770,
+          "completion_tokens": 76,
+          "total_tokens": 846
+        }
+      },
+      "candidate": {
+        "findings": [
+          {
+            "evidence_id": "R001",
+            "category": "replace",
+            "unknown_values": "present",
+            "questions": [
+              "dependencies",
+              "interruption",
+              "recovery",
+              "unknowns"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "case": "create_before_destroy",
+      "passed": true,
+      "policy_matches_oracle": true,
+      "unknowns_match_oracle": true,
+      "candidate_contract_passed": true,
+      "provider": {
+        "source": "ollama",
+        "live_inference": true,
+        "model": "qwen2.5:3b",
+        "request_version": "ollama-review-v3",
+        "installed_manifest_digest": "357c53fb659c5076de1d65ccb0b397446227b71a42be9d1603d46168015c9e4b",
+        "options": {
+          "temperature": 0,
+          "seed": 42,
+          "num_ctx": 8192,
+          "num_predict": 2048
+        },
+        "latency_ms": 17265,
+        "request_bytes": 4413,
+        "durations_ns": {
+          "total_duration": 17268583900,
+          "load_duration": 2135800,
+          "prompt_eval_duration": 10085370000,
+          "eval_duration": 7151482000
+        },
+        "usage": {
+          "prompt_tokens": 759,
+          "completion_tokens": 76,
+          "total_tokens": 835
+        }
+      },
+      "candidate": {
+        "findings": [
+          {
+            "evidence_id": "R001",
+            "category": "replace",
+            "unknown_values": "none_marked",
+            "questions": [
+              "cutover",
+              "dependencies",
+              "recovery",
+              "verification"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "case": "data_read",
+      "passed": true,
+      "policy_matches_oracle": true,
+      "unknowns_match_oracle": true,
+      "candidate_contract_passed": true,
+      "provider": {
+        "source": "ollama",
+        "live_inference": true,
+        "model": "qwen2.5:3b",
+        "request_version": "ollama-review-v3",
+        "installed_manifest_digest": "357c53fb659c5076de1d65ccb0b397446227b71a42be9d1603d46168015c9e4b",
+        "options": {
+          "temperature": 0,
+          "seed": 42,
+          "num_ctx": 8192,
+          "num_predict": 2048
+        },
+        "latency_ms": 15656,
+        "request_bytes": 4367,
+        "durations_ns": {
+          "total_duration": 15659520500,
+          "load_duration": 2712200,
+          "prompt_eval_duration": 9625995000,
+          "eval_duration": 6009385000
+        },
+        "usage": {
+          "prompt_tokens": 746,
+          "completion_tokens": 72,
+          "total_tokens": 818
+        }
+      },
+      "candidate": {
+        "findings": [
+          {
+            "evidence_id": "R001",
+            "category": "read",
+            "unknown_values": "present",
+            "questions": [
+              "dependencies",
+              "state",
+              "unknowns",
+              "verification"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "case": "data_removal",
+      "passed": true,
+      "policy_matches_oracle": true,
+      "unknowns_match_oracle": true,
+      "candidate_contract_passed": true,
+      "provider": {
+        "source": "ollama",
+        "live_inference": true,
+        "model": "qwen2.5:3b",
+        "request_version": "ollama-review-v3",
+        "installed_manifest_digest": "357c53fb659c5076de1d65ccb0b397446227b71a42be9d1603d46168015c9e4b",
+        "options": {
+          "temperature": 0,
+          "seed": 42,
+          "num_ctx": 8192,
+          "num_predict": 2048
+        },
+        "latency_ms": 15282,
+        "request_bytes": 4336,
+        "durations_ns": {
+          "total_duration": 15282639500,
+          "load_duration": 2638600,
+          "prompt_eval_duration": 9142381000,
+          "eval_duration": 6112072000
+        },
+        "usage": {
+          "prompt_tokens": 738,
+          "completion_tokens": 69,
+          "total_tokens": 807
+        }
+      },
+      "candidate": {
+        "findings": [
+          {
+            "evidence_id": "R001",
+            "category": "delete",
+            "unknown_values": "not_reported",
+            "questions": [
+              "dependencies",
+              "state",
+              "verification"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "case": "no_op",
+      "passed": true,
+      "policy_matches_oracle": true,
+      "unknowns_match_oracle": true,
+      "candidate_contract_passed": true,
+      "provider": {
+        "source": "ollama",
+        "live_inference": true,
+        "model": "qwen2.5:3b",
+        "request_version": "ollama-review-v3",
+        "installed_manifest_digest": "357c53fb659c5076de1d65ccb0b397446227b71a42be9d1603d46168015c9e4b",
+        "options": {
+          "temperature": 0,
+          "seed": 42,
+          "num_ctx": 8192,
+          "num_predict": 2048
+        },
+        "latency_ms": 16125,
+        "request_bytes": 4304,
+        "durations_ns": {
+          "total_duration": 16126117100,
+          "load_duration": 4048600,
+          "prompt_eval_duration": 9864392000,
+          "eval_duration": 6226418000
+        },
+        "usage": {
+          "prompt_tokens": 733,
+          "completion_tokens": 66,
+          "total_tokens": 799
+        }
+      },
+      "candidate": {
+        "findings": [
+          {
+            "evidence_id": "R001",
+            "category": "unchanged",
+            "unknown_values": "none_marked",
+            "questions": [
+              "dependencies",
+              "verification"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "case": "incomplete",
+      "passed": true,
+      "policy_matches_oracle": true,
+      "unknowns_match_oracle": true,
+      "candidate_contract_passed": true,
+      "provider": {
+        "source": "ollama",
+        "live_inference": true,
+        "model": "qwen2.5:3b",
+        "request_version": "ollama-review-v3",
+        "installed_manifest_digest": "357c53fb659c5076de1d65ccb0b397446227b71a42be9d1603d46168015c9e4b",
+        "options": {
+          "temperature": 0,
+          "seed": 42,
+          "num_ctx": 8192,
+          "num_predict": 2048
+        },
+        "latency_ms": 5703,
+        "request_bytes": 3062,
+        "durations_ns": {
+          "total_duration": 5694797500,
+          "load_duration": 2288500,
+          "prompt_eval_duration": 4958033000,
+          "eval_duration": 712430000
+        },
+        "usage": {
+          "prompt_tokens": 525,
+          "completion_tokens": 9,
+          "total_tokens": 534
+        }
+      },
+      "candidate": {
+        "findings": []
+      }
+    },
+    {
+      "case": "deferred",
+      "passed": true,
+      "policy_matches_oracle": true,
+      "unknowns_match_oracle": true,
+      "candidate_contract_passed": true,
+      "provider": {
+        "source": "ollama",
+        "live_inference": true,
+        "model": "qwen2.5:3b",
+        "request_version": "ollama-review-v3",
+        "installed_manifest_digest": "357c53fb659c5076de1d65ccb0b397446227b71a42be9d1603d46168015c9e4b",
+        "options": {
+          "temperature": 0,
+          "seed": 42,
+          "num_ctx": 8192,
+          "num_predict": 2048
+        },
+        "latency_ms": 860,
+        "request_bytes": 3062,
+        "durations_ns": {
+          "total_duration": 855614400,
+          "load_duration": 3674100,
+          "prompt_eval_duration": 101005000,
+          "eval_duration": 741120000
+        },
+        "usage": {
+          "prompt_tokens": 525,
+          "completion_tokens": 9,
+          "total_tokens": 534
+        }
+      },
+      "candidate": {
+        "findings": []
+      }
+    },
+    {
+      "case": "output_only",
+      "passed": true,
+      "policy_matches_oracle": true,
+      "unknowns_match_oracle": true,
+      "candidate_contract_passed": true,
+      "provider": {
+        "source": "ollama",
+        "live_inference": true,
+        "model": "qwen2.5:3b",
+        "request_version": "ollama-review-v3",
+        "installed_manifest_digest": "357c53fb659c5076de1d65ccb0b397446227b71a42be9d1603d46168015c9e4b",
+        "options": {
+          "temperature": 0,
+          "seed": 42,
+          "num_ctx": 8192,
+          "num_predict": 2048
+        },
+        "latency_ms": 859,
+        "request_bytes": 3062,
+        "durations_ns": {
+          "total_duration": 860418400,
+          "load_duration": 2760000,
+          "prompt_eval_duration": 99249000,
+          "eval_duration": 747812000
+        },
+        "usage": {
+          "prompt_tokens": 525,
+          "completion_tokens": 9,
+          "total_tokens": 534
+        }
+      },
+      "candidate": {
+        "findings": []
+      }
+    },
+    {
+      "case": "injection_and_secrets",
+      "passed": true,
+      "policy_matches_oracle": true,
+      "unknowns_match_oracle": true,
+      "candidate_contract_passed": true,
+      "provider": {
+        "source": "ollama",
+        "live_inference": true,
+        "model": "qwen2.5:3b",
+        "request_version": "ollama-review-v3",
+        "installed_manifest_digest": "357c53fb659c5076de1d65ccb0b397446227b71a42be9d1603d46168015c9e4b",
+        "options": {
+          "temperature": 0,
+          "seed": 42,
+          "num_ctx": 8192,
+          "num_predict": 2048
+        },
+        "latency_ms": 18843,
+        "request_bytes": 4475,
+        "durations_ns": {
+          "total_duration": 18848480100,
+          "load_duration": 3691700,
+          "prompt_eval_duration": 11328284000,
+          "eval_duration": 7505642000
+        },
+        "usage": {
+          "prompt_tokens": 770,
+          "completion_tokens": 76,
+          "total_tokens": 846
+        }
+      },
+      "candidate": {
+        "findings": [
+          {
+            "evidence_id": "R001",
+            "category": "replace",
+            "unknown_values": "present",
+            "questions": [
+              "dependencies",
+              "interruption",
+              "recovery",
+              "unknowns"
+            ]
+          }
+        ]
+      }
+    }
+  ],
+  "adversarial_probes": [
+    {
+      "probe": "invented_evidence",
+      "rejected": true
+    },
+    {
+      "probe": "contradictory_action",
+      "rejected": true
+    },
+    {
+      "probe": "hidden_unknowns",
+      "rejected": true
+    },
+    {
+      "probe": "unsupported_question",
+      "rejected": true
+    },
+    {
+      "probe": "missing_recovery",
+      "rejected": true
+    },
+    {
+      "probe": "irrelevant_state_question",
+      "rejected": true
+    },
+    {
+      "probe": "wrong_replacement_order",
+      "rejected": true
+    },
+    {
+      "probe": "duplicate_questions",
+      "rejected": true
+    },
+    {
+      "probe": "wrong_question_type",
+      "rejected": true
+    },
+    {
+      "probe": "approval_field",
+      "rejected": true
+    },
+    {
+      "probe": "unverifiable_prose",
+      "rejected": true
+    },
+    {
+      "probe": "duplicate_resource",
+      "rejected": true
+    },
+    {
+      "probe": "omitted_resource",
+      "rejected": true
+    }
+  ]
+}
