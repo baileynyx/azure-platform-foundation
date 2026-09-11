@@ -8,7 +8,8 @@ offline demonstration.
 
 **Automated evidence is offline.** The baseline, adversarial probes and intercepted
 HTTP tests pass. A user-run local Qwen review was rejected for confusing replacement
-orders; the [Ollama walkthrough](ollama-review.md) documents the revised request.
+orders; a subsequent attempt omitted resource evidence. The
+[Ollama walkthrough](ollama-review.md) documents the revised request schema.
 No successful live corpus evaluation, reviewer time savings or production
 readiness is claimed.
 

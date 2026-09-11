@@ -32,7 +32,7 @@ control of the decision. [Read the recorded offline demo](docs/ai/recorded-demo/
 subscription. The Windows walkthrough starts with a small model and a synthetic
 plan, then records local evaluation evidence.
 
-The AI suites include 33 Python tests, 12 synthetic baseline evaluation cases and
+The AI suites include 36 Python tests, 12 synthetic baseline evaluation cases and
 13 adversarial response probes. These are **offline contract results**; live model
 quality and reviewer time savings have not been measured. CI uses no AI credentials.
 

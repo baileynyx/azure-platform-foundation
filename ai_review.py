@@ -19,7 +19,7 @@ import plan_review
 VERSION = 'ai-review-v1'
 # Version the local request separately: the evidence and response contracts are
 # unchanged, but measurements must distinguish the revised model instructions.
-OLLAMA_REQUEST_VERSION = 'ollama-review-v2'
+OLLAMA_REQUEST_VERSION = 'ollama-review-v3'
 MAX_RESOURCES = 20
 MAX_RESPONSE = 128 * 1024
 QUESTIONS = {
@@ -276,6 +276,56 @@ def azure_request(projection, environment=None):
         raise ReviewError('Azure inference failed; check endpoint, credentials, deployment support and connectivity.') from error
 
 
+def ollama_schema(projection):
+    """Require every generated evidence ID in the local wire response.
+
+    An unconstrained findings array allowed the model to stop after a subset of
+    resources. Named required properties express coverage to the grammar itself.
+    Only aliases and validated enums enter this schema; raw plan strings do not.
+    Mandatory question membership and uniqueness remain application checks.
+    """
+    properties = {}
+    for record in projection['evidence']:
+        allowed, required = question_rules(record)
+        fields = {name: {'type': 'string', 'enum': [record[name]]}
+                  for name in ('evidence_id', 'category', 'unknown_values')}
+        fields['questions'] = {
+            'type': 'array', 'minItems': max(1, len(required)), 'maxItems': 4,
+            'items': {'type': 'string', 'enum': sorted(allowed)},
+        }
+        properties[record['evidence_id']] = {
+            'type': 'object', 'additionalProperties': False,
+            'required': list(fields), 'properties': fields,
+        }
+    return {
+        'type': 'object', 'additionalProperties': False, 'required': ['findings'],
+        'properties': {'findings': {
+            'type': 'object', 'additionalProperties': False,
+            'required': list(properties), 'properties': properties,
+        }},
+    }
+
+
+def normalize_ollama_response(value, projection):
+    """Validate wire coverage before losslessly restoring the public list shape.
+
+    Never fill omitted entries, discard extra entries or repair model facts.
+    The usual response validator still checks every finding after conversion.
+    JSON parsing has already rejected duplicate object keys at every depth.
+    """
+    if (not isinstance(value, dict) or set(value) != {'findings'} or
+            not isinstance(value['findings'], dict)):
+        raise ReviewError('Ollama response must contain an evidence-keyed findings object.')
+    identities = [record['evidence_id'] for record in projection['evidence']]
+    findings = value['findings']
+    if set(findings) != set(identities):
+        raise ReviewError('Ollama response has missing or unexpected resource evidence.')
+    for identity in identities:
+        if not isinstance(findings[identity], dict) or findings[identity].get('evidence_id') != identity:
+            raise ReviewError('Ollama finding does not match its resource evidence key.')
+    return {'findings': [findings[identity] for identity in identities]}
+
+
 def ollama_request(projection, environment=None):
     """Call an installed small model through a trusted loopback Ollama daemon.
 
@@ -326,15 +376,20 @@ required_questions ID and select ONLY from that entry's allowed_questions IDs.
 An empty required_questions list still requires at least one allowed question.
 The lists apply separately to each resource: do not transfer a question from one
 replacement to another. cutover and interruption are not interchangeable. Return
-only findings using the response schema; do not echo the constraint fields.'''
+only findings using the response schema; do not echo the constraint fields.
+findings MUST be an object keyed by EVERY input evidence_id, not an array.
+Include unchanged resources too. Each value must contain its matching evidence_id,
+category, unknown_values and questions. For zero evidence records, return an empty
+findings object. Do not stop after a subset of resources.'''
+        schema = ollama_schema(projection)
         options = {'temperature': 0, 'seed': 42, 'num_ctx': 8192, 'num_predict': 2048}
         body = {
-            'model': model, 'stream': False, 'format': SCHEMA, 'options': options, 'keep_alive': '5m',
+            'model': model, 'stream': False, 'format': schema, 'options': options, 'keep_alive': '5m',
             'messages': [{'role': 'system', 'content': instructions},
                          {'role': 'user', 'content': json.dumps({
                              'request_version': OLLAMA_REQUEST_VERSION,
                              'input': projection, 'catalogue': QUESTIONS,
-                             'question_constraints': constraints, 'response_schema': SCHEMA})}],
+                             'question_constraints': constraints, 'response_schema': schema})}],
         }
         encoded = json.dumps(body).encode('utf-8')
         request = urllib.request.Request(origin + '/api/chat', data=encoded,
@@ -356,7 +411,7 @@ only findings using the response schema; do not echo the constraint fields.'''
                      ('total_duration', 'load_duration', 'prompt_eval_duration', 'eval_duration')}
         if any(type(v) is not int or v < 0 for v in counts + list(durations.values())):
             raise ReviewError('Ollama did not return valid token counts and timings.')
-        return parse_json(content), {
+        return normalize_ollama_response(parse_json(content), projection), {
             'source': 'ollama', 'live_inference': True, 'model': model,
             'request_version': OLLAMA_REQUEST_VERSION,
             'installed_manifest_digest': digest, 'options': options,

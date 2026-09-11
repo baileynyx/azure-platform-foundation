@@ -15,7 +15,9 @@ an offline baseline. A user-run review of the destructive fixture on Ollama 0.34
 with `qwen2.5:3b` returned JSON but failed the question contract: it added
 `interruption` to the create-before-delete resource and used `cutover` instead of
 `interruption` for the delete-before-create resource. The validator rejected both
-errors. No successful live corpus evaluation is claimed yet.
+errors. A subsequent attempt failed with `Response omits resource evidence.`
+The exact omitted IDs were not captured. No successful live corpus evaluation
+is claimed yet.
 
 ## 1. Install and start Ollama on Windows
 
@@ -68,6 +70,14 @@ folder containing `ai_review.py`. Use Python 3.12 or later:
 ```powershell
 python --version
 ```
+
+Confirm the checkout includes the current schema revision before running a model:
+
+```powershell
+python -c "import ai_review; print(ai_review.OLLAMA_REQUEST_VERSION)"
+```
+
+Expected: `ollama-review-v3`. If it differs, update the checkout first.
 
 Select the model for this PowerShell session:
 
@@ -214,18 +224,36 @@ replacement questions between resources. Unknown-value and data-source rules com
 from the same validator policy. No candidate is automatically repaired, no failure
 is retried, and no validation rule is relaxed.
 
-Successful reports identify this request as `ollama-review-v2` in the provider
-metadata. Older reports lack this field. Regression tests reproduce both reported
-mistakes, separately and together, using intercepted responses. They prove request
-construction and continued rejection, not that Qwen follows the revised request.
-A fresh single-plan run on the laptop is the next validation step before the full
-12-case evaluation. If successful, expect exit 1 for this destructive fixture.
+That instruction change was version `ollama-review-v2`. After the subsequent
+coverage failure, version `ollama-review-v3` changes the native response schema:
+`findings` is now an object with a required property for every input evidence ID,
+including unchanged resources. Each value still contains the model-echoed
+`evidence_id`, `category`, `unknown_values` and `questions`. The schema restricts
+echoed facts to their expected enums and question IDs to that resource's allowed
+list. Mandatory question membership and uniqueness remain application checks.
+
+The adapter checks the exact set of keys and each echoed identity before
+converting values into the existing report array in evidence order. It never
+fills missing entries, removes extra entries or repairs questions or facts.
+Duplicate JSON keys are rejected before conversion. Zero-resource plans require
+an empty findings object. Public reports, replay format and the Azure response
+format remain arrays.
+
+Successful local reports record `ollama-review-v3` in provider metadata.
+Regression tests reject both earlier question mistakes and each possible omitted
+resource in the destructive fixture. Round-trip tests cover all 12 synthetic
+cases, including empty evidence, without changing model question order. These
+intercepted tests establish adapter behavior, not live model compliance.
+A fresh single-plan run on the laptop is still required before the full corpus.
+If successful, expect exit 1 for this destructive fixture.
 
 ## Adapter contract
 
 The implementation uses the documented [installed-model list](https://docs.ollama.com/api/tags)
 and [native chat API](https://docs.ollama.com/api/chat), with a JSON schema supplied
-through `format` and streaming disabled. Only `qwen2.5:3b` and `qwen2.5:1.5b` are
+through `format` and streaming disabled. The per-plan schema follows Ollama's
+[structured-output guidance](https://docs.ollama.com/capabilities/structured-outputs)
+and is also included in the prompt. Only `qwen2.5:3b` and `qwen2.5:1.5b` are
 accepted. Remote endpoint overrides, proxies, redirects and automatic pulls are
 not supported; Azure credentials are never attached. The model must be installed
 and report a valid manifest digest. Explicit remote-model metadata is rejected.

@@ -26,8 +26,12 @@ def tags():
 
 
 def envelope(candidate):
+    # Simulate the provider's named entries without using production conversion.
+    # Preserve extra top-level fields and invalid entries for adversarial tests.
+    wire = dict(candidate, findings={f'R{index:03d}': finding
+                                   for index, finding in enumerate(candidate['findings'], 1)})
     return {'model': MODEL, 'done': True, 'done_reason': 'stop',
-            'message': {'role': 'assistant', 'content': json.dumps(candidate)},
+            'message': {'role': 'assistant', 'content': json.dumps(wire)},
             'prompt_eval_count': 100, 'eval_count': 50,
             'total_duration': 1000000, 'load_duration': 100000,
             'prompt_eval_duration': 200000, 'eval_duration': 700000}
@@ -70,12 +74,13 @@ class OllamaTests(unittest.TestCase):
         self.assertEqual(request.get_method(), 'POST')
         self.assertEqual(dict(request.header_items()), {'Content-type': 'application/json'})
         self.assertIs(body['stream'], False)
-        self.assertEqual(body['format'], ai.SCHEMA)
+        self.assertEqual(body['format'], json.loads(body['messages'][1]['content'])['response_schema'])
+        self.assertEqual(body['format']['properties']['findings']['type'], 'object')
         self.assertEqual(body['options'], {'temperature': 0, 'seed': 42, 'num_ctx': 8192, 'num_predict': 2048})
         for marker in (b'SECRET', b'IGNORE', b'password', b'azurerm', b'module.'):
             self.assertNotIn(marker, request.data)
         metadata = result['provider']
-        self.assertEqual(metadata['request_version'], 'ollama-review-v2')
+        self.assertEqual(metadata['request_version'], 'ollama-review-v3')
         self.assertEqual(metadata['installed_manifest_digest'], DIGEST)
         self.assertEqual(metadata['usage']['total_tokens'], 150)
         self.assertEqual(metadata['durations_ns']['eval_duration'], 700000)
@@ -94,7 +99,21 @@ class OllamaTests(unittest.TestCase):
         body = json.loads(network.call_args.args[0].data)
         submitted = json.loads(body['messages'][1]['content'])
         self.assertEqual(submitted['input'], projection)
-        self.assertEqual(submitted['request_version'], 'ollama-review-v2')
+        self.assertEqual(submitted['request_version'], 'ollama-review-v3')
+        # Coverage and exact facts are now expressed in the generation schema,
+        # including the unchanged resource that still needs a finding.
+        schema = body['format']['properties']['findings']
+        self.assertEqual(schema['required'], ['R001', 'R002', 'R003', 'R004'])
+        self.assertEqual(set(schema['properties']), set(schema['required']))
+        self.assertIs(schema['additionalProperties'], False)
+        for record in projection['evidence']:
+            fields = schema['properties'][record['evidence_id']]['properties']
+            for name in ('evidence_id', 'category', 'unknown_values'):
+                self.assertEqual(fields[name]['enum'], [record[name]])
+        self.assertEqual(schema['properties']['R001']['properties']['questions']['items']['enum'],
+                         ['cutover', 'dependencies', 'recovery', 'verification'])
+        self.assertEqual(schema['properties']['R004']['properties']['questions']['items']['enum'],
+                         ['dependencies', 'interruption', 'recovery', 'verification'])
         self.assertEqual(submitted['question_constraints'], [
             {'evidence_id': 'R001',
              'allowed_questions': ['cutover', 'dependencies', 'recovery', 'verification'],
@@ -135,6 +154,62 @@ class OllamaTests(unittest.TestCase):
         # This is synthetic evidence, not a claim that the model was corrected.
         with patch('urllib.request.OpenerDirector.open', side_effect=[response(tags()), response(envelope(valid))]):
             self.assertEqual(ai.run_review(raw, 'ollama')['gate']['status'], 'review_required')
+
+    def test_named_response_rejects_each_missing_resource_without_repair(self):
+        raw = (ROOT / 'examples/plans/destructive.json').read_bytes()
+        projection, _ = ai.prepare(raw)
+        valid_envelope = envelope(ai.baseline(projection))
+        valid_wire = json.loads(valid_envelope['message']['content'])
+        invalid = []
+        # Omission of any one resource, including unchanged R002, must fail.
+        for identity in ('R001', 'R002', 'R003', 'R004'):
+            wire = json.loads(json.dumps(valid_wire))
+            del wire['findings'][identity]
+            invalid.append(wire)
+        wire = json.loads(json.dumps(valid_wire))
+        wire['findings']['R999'] = wire['findings']['R001']
+        invalid.append(wire)
+        wire = json.loads(json.dumps(valid_wire))
+        wire['findings']['R001'], wire['findings']['R004'] = wire['findings']['R004'], wire['findings']['R001']
+        invalid.append(wire)
+        invalid.extend([{'findings': {}}, ai.baseline(projection), {'findings': {'R001': None}},
+                        dict(valid_wire, approved=True)])
+        for wire in invalid:
+            completed = dict(valid_envelope, message={'role': 'assistant', 'content': json.dumps(wire)})
+            with self.subTest(wire=wire), patch('urllib.request.OpenerDirector.open',
+                                              side_effect=[response(tags()), response(completed)]):
+                with self.assertRaises(ai.ReviewError):
+                    ai.run_review(raw, 'ollama')
+
+    def test_duplicate_wire_keys_are_rejected_before_normalization(self):
+        completed = envelope(self.candidate)
+        finding = json.dumps(self.candidate['findings'][0])
+        completed['message']['content'] = '{"findings":{"R001":' + finding + ',"R001":' + finding + '}}'
+        with patch('urllib.request.OpenerDirector.open', side_effect=[response(tags()), response(completed)]):
+            with self.assertRaises(ai.ReviewError):
+                ai.run_review(payload(), 'ollama')
+
+    def test_named_response_preserves_candidates_and_handles_empty_evidence(self):
+        # Round-trip every labelled case through intercepted native wire JSON.
+        # Reverse object key order to prove mapping uses identity, not position.
+        for case in CASES:
+            raw = json.dumps(case['plan']).encode()
+            projection, _ = ai.prepare(raw)
+            valid = ai.baseline(projection)
+            for finding in valid['findings']:
+                finding['questions'].reverse()
+            completed = envelope(valid)
+            wire = json.loads(completed['message']['content'])
+            wire['findings'] = dict(reversed(list(wire['findings'].items())))
+            completed['message']['content'] = json.dumps(wire)
+            with self.subTest(case=case['name']), patch('urllib.request.OpenerDirector.open',
+                                                       side_effect=[response(tags()), response(completed)]):
+                result = ai.run_review(raw, 'ollama')
+            self.assertEqual(result['response'], valid)
+            self.assertEqual(result['gate']['status'], case['expected_policy'])
+            self.assertEqual(result['provider']['request_version'], 'ollama-review-v3')
+        empty, _ = ai.prepare(payload('output_only'))
+        self.assertEqual(ai.ollama_schema(empty)['properties']['findings']['required'], [])
 
     def test_invalid_or_cloud_model_names_never_connect(self):
         for model in ('qwen2.5:3b-cloud', 'https://evil.invalid', '../qwen', '', 'other:latest'):
