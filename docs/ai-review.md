@@ -3,12 +3,16 @@
 This project explores a narrow question: can an AI model help select useful
 infrastructure review questions while deterministic code retains control of
 facts and policy decisions? It extends the existing Terraform action reviewer
-with a Python CLI, an Azure OpenAI v1 adapter, an evaluation corpus and a recorded
+with a Python CLI, local Ollama and Azure OpenAI v1 adapters, an evaluation corpus and a recorded
 offline demonstration.
 
 **Current evidence is offline.** The baseline, adversarial probes and intercepted
-HTTP tests pass. A real Azure deployment has not been called, so there is no claim
+HTTP tests pass. Neither adapter has a recorded real model run yet, so there is no claim
 of measured model quality, reviewer time savings or production readiness.
+
+For real local inference without an Azure subscription, follow the
+[Windows Ollama walkthrough](ollama-review.md). The commands below use the
+deterministic baseline and do not load a model.
 
 ## Try it without credentials
 
@@ -60,7 +64,7 @@ Its very short duration measures local commands, not model response latency.
 flowchart TD
   P["Local plan JSON"] --> G["Existing deterministic policy"]
   G --> S["Aliases and action metadata"]
-  S --> M["Baseline or Azure model"]
+  S --> M["Baseline, Ollama or Azure model"]
   M --> V["Evidence and question checks"]
   G --> R["Local review report"]
   V --> R

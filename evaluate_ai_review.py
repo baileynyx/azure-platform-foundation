@@ -78,8 +78,8 @@ def evaluate(provider='baseline'):
     token_samples = [o['provider']['usage'] for o in observations if o.get('provider', {}).get('usage')]
     return {
         'version': ai.VERSION, 'provider_mode': provider,
-        'live_inference_requested': provider == 'azure',
-        'successful_live_responses': sum(o.get('provider', {}).get('source') == 'azure' for o in observations),
+        'live_inference_requested': provider in ('azure', 'ollama'),
+        'successful_live_responses': sum(o.get('provider', {}).get('source') in ('azure', 'ollama') for o in observations),
         'interpretation': 'Contract checks on a small synthetic corpus; not evidence of operational benefit or general model quality.',
         'cases_passed': sum(o['passed'] for o in observations), 'case_count': len(observations),
         'adversarial_probes_rejected': sum(p['rejected'] for p in probes), 'adversarial_probe_count': len(probes),
@@ -90,7 +90,7 @@ def evaluate(provider='baseline'):
 
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--provider', choices=['baseline', 'azure'], default='baseline')
+    parser.add_argument('--provider', choices=['baseline', 'azure', 'ollama'], default='baseline')
     parser.add_argument('--output-dir', type=Path, required=True)
     args = parser.parse_args(argv)
     try:

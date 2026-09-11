@@ -273,10 +273,86 @@ def azure_request(projection, environment=None):
         raise ReviewError('Azure inference failed; check endpoint, credentials, deployment support and connectivity.') from error
 
 
+def ollama_request(projection, environment=None):
+    """Call an installed small model through a trusted loopback Ollama daemon.
+
+    No pulls, credentials, proxies, redirects or remote endpoint overrides.
+    The installed manifest digest is server-reported provenance, not attestation.
+    Disable cloud in the daemon too; a loopback address alone cannot enforce it.
+    """
+    env = os.environ if environment is None else environment
+    model = env.get('OLLAMA_MODEL', 'qwen2.5:3b')
+    if model not in ('qwen2.5:3b', 'qwen2.5:1.5b'):
+        raise ReviewError('OLLAMA_MODEL must be qwen2.5:3b or qwen2.5:1.5b, installed locally.')
+    origin = 'http://127.0.0.1:11434'
+    opener = urllib.request.build_opener(urllib.request.ProxyHandler({}), NoRedirect())
+
+    def receive(request, timeout):
+        with opener.open(request, timeout=timeout) as response:
+            raw = response.read(MAX_RESPONSE + 1)
+        if len(raw) > MAX_RESPONSE:
+            raise ReviewError('Provider response exceeds 128 KiB.')
+        return parse_json(raw)
+
+    try:
+        tags = receive(urllib.request.Request(origin + '/api/tags'), 10)
+        models = tags['models']
+        if not isinstance(models, list) or not all(isinstance(item, dict) for item in models):
+            raise ReviewError('Ollama returned an invalid installed-model list.')
+        matches = [item for item in models if item.get('name') == model]
+        if len(matches) != 1:
+            raise ReviewError('Selected model is not installed; use the documented ollama pull command.')
+        installed = matches[0]
+        digest = installed.get('digest')
+        if (installed.get('remote_model') or installed.get('remote_host') or
+                not isinstance(digest, str) or not re.fullmatch(r'[0-9a-f]{64}', digest)):
+            raise ReviewError('Ollama must report a local model with a valid manifest digest.')
+        options = {'temperature': 0, 'seed': 42, 'num_ctx': 8192, 'num_predict': 2048}
+        body = {
+            'model': model, 'stream': False, 'format': SCHEMA, 'options': options, 'keep_alive': '5m',
+            'messages': [{'role': 'system', 'content': PROMPT},
+                         {'role': 'user', 'content': json.dumps({
+                             'input': projection, 'catalogue': QUESTIONS, 'response_schema': SCHEMA})}],
+        }
+        encoded = json.dumps(body).encode('utf-8')
+        request = urllib.request.Request(origin + '/api/chat', data=encoded,
+                                         headers={'Content-Type': 'application/json'}, method='POST')
+        started = time.monotonic()
+        envelope = receive(request, 180)
+        elapsed = round((time.monotonic() - started) * 1000)
+        message = envelope['message']
+        if (envelope.get('error') or envelope.get('done') is not True or
+                envelope.get('done_reason') != 'stop' or envelope.get('model') != model or
+                message.get('role') != 'assistant' or message.get('tool_calls') or
+                message.get('refusal')):
+            raise ReviewError('Ollama returned an incomplete, unexpected or unsupported completion.')
+        content = message['content']
+        if not isinstance(content, str):
+            raise ReviewError('Provider completion must contain JSON text.')
+        counts = [envelope.get(k) for k in ('prompt_eval_count', 'eval_count')]
+        durations = {k: envelope.get(k) for k in
+                     ('total_duration', 'load_duration', 'prompt_eval_duration', 'eval_duration')}
+        if any(type(v) is not int or v < 0 for v in counts + list(durations.values())):
+            raise ReviewError('Ollama did not return valid token counts and timings.')
+        return parse_json(content), {
+            'source': 'ollama', 'live_inference': True, 'model': model,
+            'installed_manifest_digest': digest, 'options': options,
+            'latency_ms': elapsed, 'request_bytes': len(encoded), 'durations_ns': durations,
+            'usage': {'prompt_tokens': counts[0], 'completion_tokens': counts[1],
+                      'total_tokens': sum(counts)},
+        }
+    except ReviewError:
+        raise
+    except (OSError, urllib.error.URLError, ValueError, KeyError, TypeError, IndexError, AttributeError) as error:
+        raise ReviewError('Local inference failed; check Ollama is running, the model is installed and memory is available.') from error
+
+
 def run_review(payload, provider='baseline', response_payload=None):
     projection, local = prepare(payload)
     if provider == 'azure':
         value, metadata = azure_request(projection)
+    elif provider == 'ollama':
+        value, metadata = ollama_request(projection)
     elif provider == 'replay':
         value = parse_json(response_payload)
         metadata = {'source': 'replay', 'live_inference': False, 'usage': None, 'latency_ms': None}
@@ -298,7 +374,7 @@ def markdown(result):
              f'Deterministic policy: **{gate["status"]}**', '',
              'Advisory only. This report is not approval to apply.', '',
              f'Local input SHA-256: {gate["sha256"]}', '']
-    if result['provider']['source'] != 'azure':
+    if result['provider']['source'] not in ('azure', 'ollama'):
         lines += ['**Offline demonstration: no live model was called.**', '']
     for warning in gate['findings']:
         lines += [f'- {warning}']
@@ -337,7 +413,7 @@ def save_new(directory, result):
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('plan', type=Path)
-    parser.add_argument('--provider', choices=['baseline', 'replay', 'azure'], default='baseline')
+    parser.add_argument('--provider', choices=['baseline', 'replay', 'azure', 'ollama'], default='baseline')
     parser.add_argument('--response', type=Path, help='Reviewed JSON response for offline replay only')
     parser.add_argument('--output-dir', required=True, type=Path)
     args = parser.parse_args(argv)
