@@ -16,8 +16,9 @@ with `qwen2.5:3b` returned JSON but failed the question contract: it added
 `interruption` to the create-before-delete resource and used `cutover` instead of
 `interruption` for the delete-before-create resource. The validator rejected both
 errors. A subsequent attempt failed with `Response omits resource evidence.`
-The exact omitted IDs were not captured. No successful live corpus evaluation
-is claimed yet.
+The exact omitted IDs were not captured. A later v3 run passed all 12 synthetic
+cases; the [results case study](ai/local-evaluation/README.md) preserves the original
+evaluation JSON, measurements and limitations.
 
 ## 1. Install and start Ollama on Windows
 
@@ -243,9 +244,10 @@ Successful local reports record `ollama-review-v3` in provider metadata.
 Regression tests reject both earlier question mistakes and each possible omitted
 resource in the destructive fixture. Round-trip tests cover all 12 synthetic
 cases, including empty evidence, without changing model question order. These
-intercepted tests establish adapter behavior, not live model compliance.
-A fresh single-plan run on the laptop is still required before the full corpus.
-If successful, expect exit 1 for this destructive fixture.
+intercepted tests establish adapter behavior. A subsequent single-plan run
+returned the expected exit 1, followed by the successful 12-case run linked above.
+For a new installation, start with the single synthetic plan before the full
+corpus; a successful review of this destructive fixture returns exit 1.
 
 ## Adapter contract
 

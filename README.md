@@ -33,8 +33,14 @@ subscription. The Windows walkthrough starts with a small model and a synthetic
 plan, then records local evaluation evidence.
 
 The AI suites include 36 Python tests, 12 synthetic baseline evaluation cases and
-13 adversarial response probes. These are **offline contract results**; live model
-quality and reviewer time savings have not been measured. CI uses no AI credentials.
+13 adversarial response probes. These automated checks are **offline contract
+results**; CI uses no AI credentials.
+
+[Read the local AI evaluation case study](docs/ai/local-evaluation/README.md):
+one Qwen 2.5 3B run passed all 12 synthetic cases after two observed failure modes
+led to stricter requests. The original JSON records 8,946 tokens and 160.656 seconds
+of combined chat latency. The study separates model results from validator probes
+and explains what remains unmeasured, including reviewer time savings.
 
 [Provision the optional Azure AI demo with Terraform](examples/ai-service/README.md):
 a separate three-resource root, one-host firewall rule, explicit model version
