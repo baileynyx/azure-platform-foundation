@@ -11,7 +11,11 @@ first. Do not install Kubernetes or a container stack for this demo.
 
 **Evidence status:** automated tests intercept HTTP and use synthetic responses.
 They do not run Ollama or establish model quality. The committed recording remains
-an offline baseline. No live local evaluation result is claimed yet.
+an offline baseline. A user-run review of the destructive fixture on Ollama 0.34.0
+with `qwen2.5:3b` returned JSON but failed the question contract: it added
+`interruption` to the create-before-delete resource and used `cutover` instead of
+`interruption` for the delete-before-create resource. The validator rejected both
+errors. No successful live corpus evaluation is claimed yet.
 
 ## 1. Install and start Ollama on Windows
 
@@ -113,8 +117,9 @@ Do not replace or pull the model during a run. Temperature 0 and a fixed seed he
 comparison but do not guarantee identical results across versions or hardware.
 
 `outbound.json` is the plan-derived projection: aliases, action enums, mode and
-unknown-value status. The request adds only the fixed instructions, question
-catalogue and response schema. Full plans, values and resource names are never
+unknown-value status. The request adds the fixed instructions, question catalogue, response schema,
+request version and per-resource allowed/required question IDs derived from the
+existing deterministic rules. These constraints add no raw plan strings. Full plans, values and resource names are never
 sent to the model. Local review files do contain resource addresses; use only
 synthetic plans for public portfolio evidence.
 
@@ -199,6 +204,22 @@ The request uses an 8,192-token context, a 2,048-token output limit, temperature
 seed 42 and a five-minute keep-alive. Large plans may exhaust these limits or the
 timeout even within the existing 20-resource input cap. Truncation is rejected.
 No weights or installer are redistributed in this repository.
+
+## Revised request after the first local failure
+
+The local request now includes a separate `question_constraints` entry for each
+evidence ID. It lists exactly which questions are allowed and which are mandatory.
+The instructions tell the model to follow the matching entry and never transfer
+replacement questions between resources. Unknown-value and data-source rules come
+from the same validator policy. No candidate is automatically repaired, no failure
+is retried, and no validation rule is relaxed.
+
+Successful reports identify this request as `ollama-review-v2` in the provider
+metadata. Older reports lack this field. Regression tests reproduce both reported
+mistakes, separately and together, using intercepted responses. They prove request
+construction and continued rejection, not that Qwen follows the revised request.
+A fresh single-plan run on the laptop is the next validation step before the full
+12-case evaluation. If successful, expect exit 1 for this destructive fixture.
 
 ## Adapter contract
 

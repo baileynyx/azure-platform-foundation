@@ -17,6 +17,9 @@ import urllib.request
 import plan_review
 
 VERSION = 'ai-review-v1'
+# Version the local request separately: the evidence and response contracts are
+# unchanged, but measurements must distinguish the revised model instructions.
+OLLAMA_REQUEST_VERSION = 'ollama-review-v2'
 MAX_RESOURCES = 20
 MAX_RESPONSE = 128 * 1024
 QUESTIONS = {
@@ -307,12 +310,31 @@ def ollama_request(projection, environment=None):
         if (installed.get('remote_model') or installed.get('remote_host') or
                 not isinstance(digest, str) or not re.fullmatch(r'[0-9a-f]{64}', digest)):
             raise ReviewError('Ollama must report a local model with a valid manifest digest.')
+        # Derive per-resource guidance from the same deterministic rules used
+        # after inference. A small model previously confused the two replacement
+        # orders when given only the general prose instructions. These lists
+        # contain generated aliases and catalogue IDs, never raw plan strings.
+        constraints = []
+        for record in projection['evidence']:
+            allowed, required = question_rules(record)
+            constraints.append({'evidence_id': record['evidence_id'],
+                                'allowed_questions': sorted(allowed),
+                                'required_questions': sorted(required)})
+        instructions = PROMPT + '''
+For each evidence_id, use its matching question_constraints entry. Include EVERY
+required_questions ID and select ONLY from that entry's allowed_questions IDs.
+An empty required_questions list still requires at least one allowed question.
+The lists apply separately to each resource: do not transfer a question from one
+replacement to another. cutover and interruption are not interchangeable. Return
+only findings using the response schema; do not echo the constraint fields.'''
         options = {'temperature': 0, 'seed': 42, 'num_ctx': 8192, 'num_predict': 2048}
         body = {
             'model': model, 'stream': False, 'format': SCHEMA, 'options': options, 'keep_alive': '5m',
-            'messages': [{'role': 'system', 'content': PROMPT},
+            'messages': [{'role': 'system', 'content': instructions},
                          {'role': 'user', 'content': json.dumps({
-                             'input': projection, 'catalogue': QUESTIONS, 'response_schema': SCHEMA})}],
+                             'request_version': OLLAMA_REQUEST_VERSION,
+                             'input': projection, 'catalogue': QUESTIONS,
+                             'question_constraints': constraints, 'response_schema': SCHEMA})}],
         }
         encoded = json.dumps(body).encode('utf-8')
         request = urllib.request.Request(origin + '/api/chat', data=encoded,
@@ -336,6 +358,7 @@ def ollama_request(projection, environment=None):
             raise ReviewError('Ollama did not return valid token counts and timings.')
         return parse_json(content), {
             'source': 'ollama', 'live_inference': True, 'model': model,
+            'request_version': OLLAMA_REQUEST_VERSION,
             'installed_manifest_digest': digest, 'options': options,
             'latency_ms': elapsed, 'request_bytes': len(encoded), 'durations_ns': durations,
             'usage': {'prompt_tokens': counts[0], 'completion_tokens': counts[1],
