@@ -50,7 +50,7 @@ jobs:
           cat reports/plan-review/safe.md reports/plan-review/destructive.md >> "$GITHUB_STEP_SUMMARY"
       - name: Check real Terraform JSON with temporary local state
         run: python check_plan_contract.py
-      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         if: always()
         with:
           name: terraform-plan-review-${{ github.run_id }}-${{ github.run_attempt }}
@@ -77,7 +77,7 @@ jobs:
         run: python rehearse_drift.py --recover-local-fixture --output-dir reports/drift/recovery
       - name: Publish the observed drift and recovery summary
         run: cat reports/drift/recovery/drift-report.md >> "$GITHUB_STEP_SUMMARY"
-      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         if: always()
         with:
           name: terraform-drift-rehearsal-${{ github.run_id }}-${{ github.run_attempt }}
@@ -112,7 +112,7 @@ jobs:
         run: python evaluate_ai_review.py --output-dir reports/ai-evaluation
       - name: Record actual CLI output without live inference
         run: python record_ai_demo.py --output-dir reports/ai-recording
-      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: ai-review-offline-${{ matrix.os }}-${{ github.run_id }}
           # Only synthetic fixtures are used; real local plans are never uploaded.
